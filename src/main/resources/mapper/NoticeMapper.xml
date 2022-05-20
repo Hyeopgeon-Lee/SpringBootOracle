@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- JAVA와 연결할 Mapper 파일 설정 -->
+<mapper namespace="kopo.poly.persistance.mapper.INoticeMapper">
+
+	<!-- 게시판 리스트 쿼리 -->
+	<select id="getNoticeList" resultType="NoticeDTO">
+		SELECT N.NOTICE_SEQ, N.TITLE, N.NOTICE_YN, N.READ_CNT, U.USER_NAME, N.USER_ID,
+			   TO_CHAR(N.REG_DT, 'YYYY-MM-DD') AS REG_DT
+	      FROM NOTICE N, USER_INFO U
+	     WHERE N.USER_ID = U.USER_ID
+	 	 ORDER BY N.NOTICE_YN, N.REG_DT DESC
+	</select>
+	
+	<!-- 게시판 등록 쿼리 -->
+	<insert id="InsertNoticeInfo" parameterType="NoticeDTO">
+		INSERT INTO NOTICE
+			(
+				NOTICE_SEQ, TITLE, NOTICE_YN, CONTENTS, USER_ID, READ_CNT, 
+		      	REG_ID, REG_DT, CHG_ID, CHG_DT
+			)
+		VALUES(
+			(SELECT NVL(MAX(A.NOTICE_SEQ),0)+1 FROM NOTICE A),
+			#{title}, #{notice_yn}, #{contents}, #{user_id}, 0, #{user_id}, SYSDATE, #{user_id}, SYSDATE
+		)
+	</insert>
+	
+	<!-- 게시판 상세보기 쿼리 -->
+	<select id="getNoticeInfo" resultType="NoticeDTO">
+		SELECT N.NOTICE_SEQ, N.TITLE, N.NOTICE_YN, N.READ_CNT, U.USER_NAME, N.USER_ID,
+			   CONTENTS, TO_CHAR(N.REG_DT, 'YYYY-MM-DD') AS REG_DT
+	      FROM NOTICE N, USER_INFO U
+	     WHERE N.USER_ID = U.USER_ID 
+	       AND N.NOTICE_SEQ = #{notice_seq}
+	</select>
+	
+
+	
+	<!-- 조회수 증가 쿼리 -->
+	<update id="updateNoticeReadCnt" parameterType="NoticeDTO">
+		UPDATE NOTICE SET
+			READ_CNT = READ_CNT + 1
+		WHERE
+			NOTICE_SEQ = #{notice_seq}		
+	</update>
+
+	<!-- 게시판 수정 쿼리 -->
+	<update id="updateNoticeInfo" parameterType="NoticeDTO">
+		UPDATE NOTICE SET
+			TITLE = #{title},
+			NOTICE_YN = #{notice_yn},
+			CONTENTS = #{contents},
+			CHG_ID = #{user_id},
+			CHG_DT = SYSDATE
+		WHERE
+			NOTICE_SEQ = #{notice_seq}	
+			
+	</update>
+
+	<!-- 게시판 삭제 쿼리 -->
+	<delete id="deleteNoticeInfo" parameterType="NoticeDTO">
+		DELETE FROM NOTICE
+		WHERE NOTICE_SEQ = #{notice_seq}	
+			
+	</delete>
+			
+</mapper>
