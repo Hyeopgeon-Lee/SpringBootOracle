@@ -4,7 +4,6 @@ import kopo.poly.dto.NoticeDTO;
 import kopo.poly.persistance.mapper.INoticeMapper;
 import kopo.poly.service.INoticeService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ public class NoticeService implements INoticeService {
 
     private final INoticeMapper noticeMapper;
 
-    @Autowired
     public NoticeService(INoticeMapper noticeMapper) {
         this.noticeMapper = noticeMapper;
     }
