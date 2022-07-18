@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>실시간 날씨 조회하기</title>
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            let lon, lat;
+
+            navigator.geolocation.getCurrentPosition(function (position) {
+                lat = position.coords.latitude; // 위도
+                lon = position.coords.longitude; // 경도
+
+                $.ajax({
+                    url: "/weather/getWeather",
+                    type: "get",
+                    dataType: "JSON",
+                    data: {
+                        "lon": lon,
+                        "lat": lat
+
+                    },
+                    success: function (json) {
+                        $("#currentTemp").append(json.currentTemp);
+
+                        const dailyList = json.dailyList; // List 구조의 일별 날씨 정보
+
+                        for (const daily of dailyList) {
+
+                            let day = daily.day; // 기준 일자
+                            let sunrise = daily.sunrise; // 해뜨는 시간
+                            let sunset = daily.sunset; // 해지는 시간
+                            let moonrise = daily.moonrise; // 달뜨는 시간
+                            let moonset = daily.moonset; // 달지는 시간
+                            let dayTemp = daily.dayTemp; // 평균 기온
+                            let dayTempMax = daily.dayTempMax; // 최고 기온
+                            let dayTempMin = daily.dayTempMin; // 최저 기온
+
+                            $("#daily_weather").append("<div><b>" + day + "의 날씨</b></div>");
+                            $("#daily_weather").append("<div>");
+                            $("#daily_weather").append("<span>해뜨는 시간 : " + sunrise + " </span>");
+                            $("#daily_weather").append("<span>해지는 시간 : " + sunset + " </span>");
+                            $("#daily_weather").append("<span>달뜨는 시간 : " + moonrise + " </span>");
+                            $("#daily_weather").append("<span>달지는 시간 : " + moonset + " </span>");
+                            $("#daily_weather").append("<span>평균 기온 : " + dayTemp + " </span>");
+                            $("#daily_weather").append("<span>최대 기온 : " + dayTempMax + " </span>");
+                            $("#daily_weather").append("<span>최저 기온 : " + dayTempMin + " </span>");
+                            $("#daily_weather").append("</div>");
+                            $("#daily_weather").append("<br/><br/>");
+
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+</head>
+<body>
+<div>
+    <label>현재 기온 : </label>
+    <span id="currentTemp"></span>
+</div>
+<br/><br/>
+<div>
+    <b>일자별 기온</b>
+</div>
+<hr/>
+<div id="daily_weather">
+</div>
+
+</body>
+</html>

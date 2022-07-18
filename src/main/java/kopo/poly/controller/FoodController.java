@@ -1,6 +1,6 @@
 package kopo.poly.controller;
 
-
+import kopo.poly.dto.FoodDTO;
 import kopo.poly.service.IFoodService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -8,8 +8,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Slf4j
+@RequestMapping(value="/food")
 @Controller
 public class FoodController {
 
@@ -19,20 +21,19 @@ public class FoodController {
     /**
      * 서울강서캠퍼스 식단 수집을 위한 URL 호출
      */
-    @RequestMapping(value = "food/getFoodInfoFromWEB")
-    public String getFoodInfoFromWEB(ModelMap model)
-            throws Exception {
+    @RequestMapping(value = "toDayFood")
+    public String collectFood(ModelMap model) throws Exception {
 
-        log.info(this.getClass().getName() + ".getFoodInfoFromWEB start!");
+        log.info(this.getClass().getName() + ".toDayFood Start!");
 
-        int res = foodService.getFoodInfoFromWEB();
+        List<FoodDTO> rList = foodService.toDayFood();
 
         //크롤링 결과를 넣어주기
-        model.addAttribute("res", String.valueOf(res));
+        model.addAttribute("rList", rList);
 
-        log.info(this.getClass().getName() + ".getFoodInfoFromWEB end!");
+        log.info(this.getClass().getName() + ".toDayFood End!");
 
-        return "/food/FoodForWEB";
+        return "/food/todayFood";
     }
 
 }

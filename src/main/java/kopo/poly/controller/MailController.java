@@ -62,7 +62,7 @@ public class MailController {
 
         }
 
-        //메일 발송 결과를 JSP에 전달하기(데이터 전달시, 숫자보단 문자열이 컨트롤하기 편리하기 때문에 강제로 숫자를 문자로 변환함)ㄴ
+        //메일 발송 결과를 JSP에 전달하기(데이터 전달시, 숫자보단 문자열이 컨트롤하기 편리하기 때문에 강제로 숫자를 문자로 변환함)
         model.addAttribute("res", String.valueOf(res));
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
@@ -72,3 +72,4 @@ public class MailController {
         return "/mail/sendMailResult";
     }
 }
+

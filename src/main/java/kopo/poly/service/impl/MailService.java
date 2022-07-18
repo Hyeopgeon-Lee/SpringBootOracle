@@ -16,7 +16,7 @@ import java.util.Properties;
 public class MailService implements IMailService {
 
     final String host = "smtp.naver.com"; // 네이버에서 제공하는 SMTP서버
-    final String user = "polytech_data16"; // 본인 네이버 아이디
+    final String user = "polytech_data16@naver.com"; // 본인 네이버 아이디
     final String password = "vhfflxpr"; // 본인 네이버 아이디
 
     @Override
@@ -37,10 +37,11 @@ public class MailService implements IMailService {
 
         Properties props = new Properties();
         props.put("mail.smtp.host", host); // javax 외부 라이브러리에 메일 보내는 사람의 정보 설정
+        props.put("mail.smtp.port", 587); // javax 외부 라이브러리에 메일 보내는 사람의 정보 설정
         props.put("mail.smtp.auth", "true"); // javax 외부 라이브러리에 메일 보내는 사람 인증 여부 설정
 
         // 네이버 SMTP서버 인증 처리 로직
-        Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+        Session session = Session.getDefaultInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(user, password);
             }

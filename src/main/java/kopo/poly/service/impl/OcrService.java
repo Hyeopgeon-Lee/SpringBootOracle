@@ -1,7 +1,6 @@
 package kopo.poly.service.impl;
 
 import kopo.poly.dto.OcrDTO;
-import kopo.poly.persistance.mapper.IOcrMapper;
 import kopo.poly.service.IOcrService;
 import kopo.poly.util.CmmUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +13,6 @@ import java.io.File;
 @Slf4j
 @Service("OcrService")
 public class OcrService implements IOcrService {
-
-    private final IOcrMapper ocrMapper;
-
-    public OcrService(IOcrMapper ocrMapper) {
-        this.ocrMapper = ocrMapper;
-    }
 
     /**
      * 이미지 파일로부터 문자 읽어 오기
@@ -52,9 +45,6 @@ public class OcrService implements IOcrService {
         pDTO.setTextFromImage(result);
 
         log.info("result : " + result);
-
-        //문자열 인식 결과를  DB에 저장
-        ocrMapper.InsertOcrInfo(pDTO);
 
         log.info(this.getClass().getName() + ".getFoodInfoFromWEB End!");
 

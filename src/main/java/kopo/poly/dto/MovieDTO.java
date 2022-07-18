@@ -19,5 +19,4 @@ public class MovieDTO {
     private String chg_id;
     private String chg_dt;
 
-
 }

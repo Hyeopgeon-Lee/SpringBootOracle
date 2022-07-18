@@ -7,6 +7,8 @@ import kopo.poly.util.EncryptUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
+@RequestMapping(value="/user")
 @Controller
 public class UserInfoController {
 
@@ -27,7 +30,7 @@ public class UserInfoController {
     /**
      * 회원가입 화면으로 이동
      */
-    @RequestMapping(value = "user/userRegForm")
+    @GetMapping (value = "userRegForm")
     public String userRegForm() {
         log.info(this.getClass().getName() + ".user/userRegForm ok!");
 
@@ -38,7 +41,7 @@ public class UserInfoController {
     /**
      * 회원가입 로직 처리
      */
-    @RequestMapping(value = "user/insertUserInfo")
+    @PostMapping(value = "insertUserInfo")
     public String insertUserInfo(HttpServletRequest request, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".insertUserInfo start!");
@@ -157,14 +160,14 @@ public class UserInfoController {
 
         }
 
-        return "/user/Msg";
+        return "/user/UserRegSuccess";
     }
 
 
     /**
      * 로그인을 위한 입력 화면으로 이동
      */
-    @RequestMapping(value = "user/loginForm")
+    @GetMapping(value = "loginForm")
     public String loginForm() {
         log.info(this.getClass().getName() + ".user/loginForm ok!");
 
@@ -175,7 +178,7 @@ public class UserInfoController {
     /**
      * 로그인 처리 및 결과 알려주는 화면으로 이동
      */
-    @RequestMapping(value = "user/getUserLoginCheck")
+    @PostMapping(value = "getUserLoginCheck")
     public String getUserLoginCheck(HttpSession session, HttpServletRequest request, ModelMap model) throws Exception {
         log.info(this.getClass().getName() + ".getUserLoginCheck start!");
 

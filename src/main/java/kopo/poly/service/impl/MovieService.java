@@ -11,8 +11,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Slf4j
 @Service("MovieService")
@@ -21,17 +24,20 @@ public class MovieService implements IMovieService {
     private final IMovieMapper movieMapper;
 
     public MovieService(IMovieMapper movieMapper) {
+
         this.movieMapper = movieMapper;
     }
 
     /**
      * JSOUP 라이브러리를 통한 CGV 영화 순위 정보가져오기
      */
+    @Transactional
     @Override
-    public int getMovieInfoFromWEB() throws Exception {
+//    @Scheduled(cron = "5 * * * * *")
+    public int collectMovieRank() throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".getMovieInfoFromWEB start!");
+        log.info(this.getClass().getName() + ".collectMovieRank Start!");
 
         int res = 0; //크롤링 결과 (0보다 크면 크롤링 성공)
 
@@ -56,7 +62,6 @@ public class MovieService implements IMovieService {
         Iterator<Element> score = element.select("span.percent").iterator(); //점수
         Iterator<Element> open_day = element.select("span.txt-info").iterator(); //개봉일
 
-
         MovieDTO pDTO = null;
 
         //수집된 데이터 DB에 저장하기
@@ -65,9 +70,10 @@ public class MovieService implements IMovieService {
             pDTO = new MovieDTO(); //수집된 영화정보를 DTO에 저장하기 위해 메모리에 올리기
 
             //수집시간을 기본키(pk)로 사용
-            pDTO.setCollect_time(DateUtil.getDateTime("yyyyMMdd"));
+            pDTO.setCollect_time(DateUtil.getDateTime("yyyyMMddhhmmss"));
 
-            //영화 순위(trim 함수 추가 이유 : trim 함수는 글자의 앞뒤 공백 삭제 역할을 수행하여,데이터 수집시, 홈페이지 개발자들을 앞뒤 공백 집어넣을 수 있어서 추가)
+            //영화 순위(trim 함수 추가 이유 : trim 함수는 글자의 앞뒤 공백 삭제 역할을 수행하여,데이터 수집시,
+            // 홈페이지 개발자들을 앞뒤 공백 집어넣을 수 있어서 추가)
             String rank = CmmUtil.nvl(movie_rank.next().text()).trim();  //No.1 들어옴
             pDTO.setMovie_rank(rank.substring(3, rank.length()));
 
@@ -92,9 +98,29 @@ public class MovieService implements IMovieService {
         }
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".getMovieInfoFromWEB end!");
+        log.info(this.getClass().getName() + ".collectMovieRank End!");
 
         return res;
     }
 
+    @Override
+    public List<MovieDTO> getMovieInfo(MovieDTO pDTO) throws Exception {
+
+        // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
+        log.info(this.getClass().getName() + ".getMovieInfo Start!");
+
+        // DB에서 조회하기
+        List<MovieDTO> rList = movieMapper.getMovieInfo(pDTO);
+
+        // DB 조회 결과가 없다면, NullPointer 에러 방지를 위해
+        // 데이터가 존재하는 않는 객체로 메모리에 올리기
+        if (rList == null) {
+            rList = new ArrayList<>();
+        }
+
+        // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
+        log.info(this.getClass().getName() + ".getMovieInfo End!");
+
+        return rList;
+    }
 }

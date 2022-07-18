@@ -146,7 +146,8 @@ public class UserInfoService implements IUserInfoService {
             mDTO.setTitle("로그인 알림!"); //제목
 
             //메일 내용에 가입자 이름넣어서 내용 발송
-            mDTO.setContents(DateUtil.getDateTime("yyyy.MM.dd 24h:mm:ss") + "에 " + CmmUtil.nvl(rDTO.getUser_name()) + "님이 로그인하였습니다.");
+            mDTO.setContents(DateUtil.getDateTime("yyyy.MM.dd hh:mm:ss") + "에 "
+                    + CmmUtil.nvl(rDTO.getUser_name()) + "님이 로그인하였습니다.");
 
             //회원 가입이 성공했기 때문에 메일을 발송함
             mailService.doSendMail(mDTO);
@@ -156,7 +157,6 @@ public class UserInfoService implements IUserInfoService {
              *        				메일 발송 로직 추가 끝!!
              * #######################################################
              */
-
 
         }
 

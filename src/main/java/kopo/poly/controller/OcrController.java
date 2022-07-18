@@ -13,11 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 
 @Slf4j
+@RequestMapping(value="/ocr")
 @Controller
 public class OcrController {
 
@@ -34,21 +33,21 @@ public class OcrController {
     /**
      * 이미지 인식을 위한 파일업로드 화면 호출
      */
-    @RequestMapping(value="ocr/imageFileUpload")
-    public String Index() {
-        log.info(this.getClass().getName() + ".imageFileUpload!");
+    @RequestMapping(value="uploadImage")
+    public String uploadImage() {
+        log.info(this.getClass().getName() + ".uploadImage!");
 
-        return "/ocr/ImageFileUplaod";
+        return "/ocr/uploadImage";
     }
 
     /**
      * 파일업로드 및 이미지 인식
      */
-    @RequestMapping(value = "ocr/getReadforImageText")
-    public String getReadforImageText(HttpServletRequest request, HttpServletResponse response, ModelMap model,
-                                      @RequestParam(value = "fileUpload") MultipartFile mf) throws Exception {
+    @RequestMapping(value = "readImage")
+    public String readImage(ModelMap model, @RequestParam(value = "fileUpload") MultipartFile mf)
+            throws Exception {
 
-        log.info(this.getClass().getName() + ".getReadforImageText Start!");
+        log.info(this.getClass().getName() + ".readImage Start!");
 
         // OCR 실행 결과
         String res = "";
@@ -57,8 +56,9 @@ public class OcrController {
         // 다운로드 기능 구현시, 임의로 정의된 파일명을 원래대로 만들어주기 위한 목적
         String originalFileName = mf.getOriginalFilename();
 
-        // 파일 확장자 가져오기
-        String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1, originalFileName.length()).toLowerCase();
+        // 파일 확장자 가져오기(파일 확장자를 포함한 전체 이름(myimage.jpg)에서 뒤쪽부터 .이 존재하는 위치 찾기
+        String ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1,
+                originalFileName.length()).toLowerCase();
 
         // 이미지 파일만 실행되도록 함
         if (ext.equals("jpeg") || ext.equals("jpg") || ext.equals("gif") || ext.equals("png")) {
@@ -106,11 +106,12 @@ public class OcrController {
 
         }
 
-        // 크롤링 결과를 넣어주기
+        // 이미지로부터 인식된 문자를 JSP에 전달하기
         model.addAttribute("res", res);
 
-        log.info(this.getClass().getName() + ".getReadforImageText End!");
+        log.info(this.getClass().getName() + ".readImage End!");
 
-        return "/ocr/TextFromImage";
+        return "/ocr/readImage";
     }
 }
+

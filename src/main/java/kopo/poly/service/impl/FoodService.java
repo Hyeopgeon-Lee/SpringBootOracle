@@ -1,10 +1,8 @@
 package kopo.poly.service.impl;
 
 import kopo.poly.dto.FoodDTO;
-import kopo.poly.persistance.mapper.IFoodMapper;
 import kopo.poly.service.IFoodService;
 import kopo.poly.util.CmmUtil;
-import kopo.poly.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,23 +10,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Slf4j
 @Service("FoodService")
 public class FoodService implements IFoodService {
 
-    private final IFoodMapper foodMapper;
-
-    public FoodService(IFoodMapper foodMapper) {
-        this.foodMapper = foodMapper;
-    }
-
     @Override
-    public int getFoodInfoFromWEB() throws Exception {
+    public List<FoodDTO> toDayFood() throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".getFoodInfoFromWEB start!");
+        log.info(this.getClass().getName() + ".toDayFood Start!");
 
         int res = 0; //크롤링 결과 (0보다 크면 크롤링 성공)
 
@@ -44,16 +38,19 @@ public class FoodService implements IFoodService {
         Elements element = doc.select("table.tbl_table tbody");
 
         // Iterator을 사용하여 영화 순위 정보를 가져오기
-        Iterator<Element> foodList = element.select("tr").iterator(); //영화 순위
+        Iterator<Element> foodIt = element.select("tr").iterator(); //영화 순위
 
         FoodDTO pDTO = null;
 
+        List<FoodDTO> pList = new ArrayList<>();
         int idx = 0; //반복횟수를 월요일부터 금요일까지만 되도록함(5일동안만)
-        //수집된 데이터 DB에 저장하기
-        while (foodList.hasNext()) {
 
+        //수집된 데이터 DB에 저장하기
+        while (foodIt.hasNext()) {
+
+            //반복횟수 카운팅하기, 5번째가 금요일이라 6번째인 토요일은 실행안되게 하기 위함
             //반복문 5번만 돌기(월요일부터 금요일까지만 넣기)
-            if (idx > 4) {
+            if (idx++ > 4) {
                 break;
 
             }
@@ -72,31 +69,24 @@ public class FoodService implements IFoodService {
 
 			 * */
 
-            //수집시간을 기본키(pk)로 사용
-            pDTO.setCollect_time(DateUtil.getDateTime("yyyyMMdd24hmmss"));
-
             //요일별 식단 정보들어옴
-            String food = CmmUtil.nvl(foodList.next().text()).trim();
+            String food = CmmUtil.nvl(foodIt.next().text()).trim();
 
+            log.info("food : " + food);
             //앞의 3글자가 요일이기 때문에 요일 저장
             pDTO.setDay(food.substring(0, 3));
 
             //식단 정보
             pDTO.setFood_nm(food.substring(4));
 
-            //등록자
-            pDTO.setReg_id("admin");
+            pList.add(pDTO);
 
-            //영화 한개씩 추가
-            res += foodMapper.InsertFoodInfo(pDTO);
-
-            idx++;
         }
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".getFoodInfoFromWEB end!");
+        log.info(this.getClass().getName() + ".toDayFood End!");
 
-        return res;
+        return pList;
     }
 
 }
