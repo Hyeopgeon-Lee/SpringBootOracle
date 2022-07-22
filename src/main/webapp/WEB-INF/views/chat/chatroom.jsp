@@ -2,16 +2,13 @@
          pageEncoding="UTF-8" %>
 <%@ page import="kopo.poly.util.CmmUtil" %>
 <%
-
     // 채팅방 입장전 입력한 별명
     String nickname = CmmUtil.nvl(request.getParameter("nickname"));
-
 %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>SeoGram - SEO Agency Template</title>
+    <title>단독 채팅방</title>
+    <meta charset="UTF-8">
     <script src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
 
@@ -33,13 +30,12 @@
                 return;
             }
 
-            // ws = new WebSocket("ws://13.208.147.39:11000/chat");  //aws 소켓
-            ws = new WebSocket("ws://" + location.host + "/ws"); //local 소켓
+            ws = new WebSocket("ws://13.208.147.39:11000/chat");  //aws 소켓
 
             ws.onopen = function (event) {
-                if (event.data === undefined)
+                if (event.data === undefined){
                     return;
-
+                }
                 console.log(event.data)
             };
 
@@ -48,7 +44,6 @@
 
                 // 웹소켓으로부터 받은 데이터를 JSON 구조로 변환하기
                 let data = JSON.parse(msg.data);
-
 
                 if (data.name == ss_user_name) {
                     $("#chat").append("[내가보낸 메시지] : " + data.msg + " | 보낸사람 : " + data.name + " | 메시지 보낸시간 : " + data.date + "<br/>");

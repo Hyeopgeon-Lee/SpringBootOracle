@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 파파고를 이용한 한글->영어, 영어->한글 번역</title>
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script>
+
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+
+            // html의 btnSend id의 버튼 객체 가져오기
+            const btnSend = document.getElementById("btnSend");
+
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            btnSend.addEventListener("click", e => {
+                translate(); // 번역하기 실행
+            })
+
+        })
+
+        function translate() {
+
+            $.ajax({
+                url: "/papago/translate",
+                type: "get",
+                dataType: "JSON",
+                data: {
+                    "text": $("#text").val()
+                },
+                success: function (json) {
+
+                    let text = json.text; // 원글
+                    let translatedText = json.translatedText; // 번역글
+                    let tarLangType = json.tarLangType; // 번역된 언어
+                    let tarLang = ""; // 번역된 언어 문자
+
+                    if (tarLangType == "ko") {
+                        tarLang = "한글 번역";
+
+                    } else if (tarLangType == "en") {
+                        tarLang = "영어 번역";
+
+                    }
+
+                    $("#contents").append("<div>");
+                    $("#contents").append("<span>(원문) " + text + " </span>");
+                    $("#contents").append("<span> => </span>");
+                    $("#contents").append("<span>(" + tarLang + ") <b>" + translatedText + "</b> </span>");
+                    $("#contents").append("</div>");
+                    $("#contents").append("<br/><br/>");
+
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+<h2>네이버 파파고를 이용한 한글->영어, 영어->한글 번역</h2>
+<hr/>
+<br/><br/>
+<div id="contents"><b>파파고 번역 내용</b><br/></div>
+<div>-------------------------------------------</div>
+<br/><br/>
+<label>번역할 문장</label>
+<input type="text" id="text"/>
+<button id="btnSend">번역하기</button>
+</body>
+</html>
+

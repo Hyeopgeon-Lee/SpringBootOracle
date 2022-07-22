@@ -8,6 +8,7 @@ import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
 import kopo.poly.util.NetworkUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -19,6 +20,9 @@ import java.util.Map;
 @Service("WeatherService")
 public class WeatherService implements IWeatherService {
 
+    @Value("${weather.api.key}")
+    private String apiKey;
+
     @Override
     public WeatherDTO getWeather(WeatherDTO pDTO) throws Exception {
 
@@ -27,11 +31,10 @@ public class WeatherService implements IWeatherService {
         String lat = CmmUtil.nvl(pDTO.getLat());
         String lon = CmmUtil.nvl(pDTO.getLon());
 
-        String apiParam = "?lat=" + lat + "&lon=" + lon + "&appid=" + IWeatherService.apiKey + "&units=metric";
+        String apiParam = "?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey + "&units=metric";
+        log.info("apiParam " + apiParam);
 
-        NetworkUtil nu = new NetworkUtil();
-        String json = nu.getUrlJSON(IWeatherService.apiURL + apiParam);
-
+        String json = NetworkUtil.get(IWeatherService.apiURL + apiParam);
         log.info("json " + json);
 
         // JSON 구조를 Map 데이터 구조로 변경하기
@@ -42,7 +45,6 @@ public class WeatherService implements IWeatherService {
         Map<String, Double> current = (Map<String, Double>) rMap.get("current");
 
         double currnetTemp = current.get("temp"); // 현재 기온
-
         log.info("현재 기온 : " + currnetTemp);
 
 
@@ -95,7 +97,6 @@ public class WeatherService implements IWeatherService {
             wdDTO = null;
         }
 
-
         WeatherDTO rDTO = new WeatherDTO();
 
         rDTO.setLat(lat);
@@ -107,5 +108,5 @@ public class WeatherService implements IWeatherService {
 
         return rDTO;
     }
-
 }
+
