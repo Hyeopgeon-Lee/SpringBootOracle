@@ -39,6 +39,7 @@
 
             // 접속 URL 예 : ws://localhost:10000/ws/테스트방/별명
             ws = new WebSocket("ws://" + location.host + "/ws/" + roomname + "/" + nickname);
+            // ws = new WebSocket("ws://" + location.host + "/ws/DS/DFGHG");
 
             // 웹소켓 열기
             ws.onopen = function (event) {

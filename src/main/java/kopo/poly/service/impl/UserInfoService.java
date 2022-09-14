@@ -8,20 +8,21 @@ import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
 import kopo.poly.util.EncryptUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service("UserInfoService")
 public class UserInfoService implements IUserInfoService {
 
+    // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
+    // userInfoMapper 변수에 이미 메모리에 올라간 Mapper 객체를 넣어줌
+    // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
     private final IUserInfoMapper userInfoMapper;
-
-    public UserInfoService(IUserInfoMapper userInfoMapper) {
-        this.userInfoMapper = userInfoMapper;
-    }
 
     //메일 발송을 위한 MailService 자바 객체 가져오기
     @Resource(name = "MailService")

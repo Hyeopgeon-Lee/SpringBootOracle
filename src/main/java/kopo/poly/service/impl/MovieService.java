@@ -5,6 +5,7 @@ import kopo.poly.persistance.mapper.IMovieMapper;
 import kopo.poly.service.IMovieService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,15 +19,14 @@ import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service("MovieService")
 public class MovieService implements IMovieService {
 
+    // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
+    // movieMapper 변수에 이미 메모리에 올라간 Mapper 객체를 넣어줌
+    // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
     private final IMovieMapper movieMapper;
-
-    public MovieService(IMovieMapper movieMapper) {
-
-        this.movieMapper = movieMapper;
-    }
 
     /**
      * JSOUP 라이브러리를 통한 CGV 영화 순위 정보가져오기
