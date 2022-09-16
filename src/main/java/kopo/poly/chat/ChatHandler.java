@@ -52,7 +52,6 @@ public class ChatHandler extends TextWebSocketHandler {
         // 메시지 발송시간 서버 시간으로 설정하여 추가하기
         cDTO.setDate(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"));
 
-
         String sendMsg = CmmUtil.nvl(cDTO.getMsg()); // 발송하는 메시지(번역을 위해 가져옴)
         log.info("sendMsg : " + sendMsg);
 
@@ -60,10 +59,7 @@ public class ChatHandler extends TextWebSocketHandler {
         PapagoDTO pDTO = new PapagoDTO();
         pDTO.setText(sendMsg);
 
-        log.info("asfdasfdasfdasd");
-
         PapagoDTO rDTO = papagoService.translate(pDTO);
-        log.info("asfdasfdasfdasd12341");
 
         if (rDTO == null) {
             rDTO = new PapagoDTO();
