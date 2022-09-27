@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>회원가입 화면</title>
+    <link rel="stylesheet" href="/css/table.css"/>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript">
         //회원가입 정보의 유효성 체크하기
@@ -77,21 +78,66 @@
 
 </head>
 <body>
-<h1>회원가입 화면</h1>
+<h2>회원 가입하기</h2>
+<hr/>
 <br/>
 <form name="f" method="post" action="/user/insertUserInfo" onsubmit="return doRegUserCheck(this);">
-    <label>* 아이디 : <input type="text" name="user_id" style="width:400px"/></label><br/>
-    <label>* 이름 : <input type="text" name="user_name" style="width:400px"/></label><br/>
-    <hr/>
-    <label>* 비밀번호 : <input type="password" name="password" style="width:400px"/></label><br/>
-    <label>* 비밀번호확인 : <input type="password" name="password2" style="width:400px"/></label><br/>
-    <hr/>
-    <label>* 이메일 : <input type="email" name="email" style="width:400px"/> </label><br/>
-    <label>* 주소 : <input type="text" name="addr1" style="width:400px" readonly/></label>
-    <input type="button" value="우편번호" onclick="kakaoPost(this.form)"/>
-    <br/>
-    <label>* 상세 주소 : <input type="text" name="addr2" style="width:400px"/></label><br/>
-    <input type="submit" value="회원가입"/>
+
+    <div class="divTable minimalistBlack">
+        <div class="divTableBody">
+            <div class="divTableRow">
+                <div class="divTableCell">* 아이디
+                </div>
+                <div class="divTableCell">
+                    <input type="text" name="user_id" style="width:95%"/>
+                </div>
+            </div>
+            <div class="divTableRow">
+                <div class="divTableCell">* 이름
+                </div>
+                <div class="divTableCell">
+                    <input type="text" name="user_name" style="width:95%"/>
+                </div>
+            </div>
+            <div class="divTableRow">
+                <div class="divTableCell">* 비밀번호
+                </div>
+                <div class="divTableCell">
+                    <input type="password" name="password" style="width:95%"/>
+                </div>
+            </div>
+            <div class="divTableRow">
+                <div class="divTableCell">* 비밀번호확인
+                </div>
+                <div class="divTableCell">
+                    <input type="password" name="password2" style="width:95%"/>
+                </div>
+            </div>
+            <div class="divTableRow">
+                <div class="divTableCell">* 이메일
+                </div>
+                <div class="divTableCell">
+                    <input type="email" name="email" style="width:95%"/>
+                </div>
+            </div>
+            <div class="divTableRow">
+                <div class="divTableCell">* 주소
+                </div>
+                <div class="divTableCell">
+                    <input type="text" name="addr1" style="width:85%"/>
+                    <input type="button" value="우편번호" onclick="kakaoPost(this.form)"/>
+                </div>
+            </div>
+            <div class="divTableRow">
+                <div class="divTableCell">* 상세 주소
+                </div>
+                <div class="divTableCell">
+                    <input type="text" name="addr2" style="width:95%"/>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div><input type="submit" value="회원가입"/></div>
 </form>
 </body>
 </html>

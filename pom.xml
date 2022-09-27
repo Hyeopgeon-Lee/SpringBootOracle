@@ -58,9 +58,8 @@
 
         <!-- 메일 발송을 위한 외부라이브러리-->
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.4.7</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
         <!-- OCR 구현을 위한 Tesseract 라이브러리 다운로드 -->

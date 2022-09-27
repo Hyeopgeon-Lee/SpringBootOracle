@@ -3,21 +3,24 @@ package kopo.poly.service.impl;
 import kopo.poly.dto.MailDTO;
 import kopo.poly.service.IMailService;
 import kopo.poly.util.CmmUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Properties;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service("MailService")
 public class MailService implements IMailService {
 
-    final String host = "smtp.naver.com"; // 네이버에서 제공하는 SMTP서버
-    final String user = "polytech_data16@naver.com"; // 본인 네이버 아이디
-    final String password = "vhfflxpr"; // 본인 네이버 아이디
+    private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String fromMail;
 
     @Override
     public int doSendMail(MailDTO pDTO) {
@@ -34,36 +37,27 @@ public class MailService implements IMailService {
         }
 
         String toMail = CmmUtil.nvl(pDTO.getToMail()); // 받는사람
+        String title = CmmUtil.nvl(pDTO.getTitle()); // 메일제목
+        String contents = CmmUtil.nvl(pDTO.getTitle()); // 메일제목
 
-        Properties props = new Properties();
-        props.put("mail.smtp.host", host); // javax 외부 라이브러리에 메일 보내는 사람의 정보 설정
-        props.put("mail.smtp.port", 587); // javax 외부 라이브러리에 메일 보내는 사람의 정보 설정
-        props.put("mail.smtp.auth", "true"); // javax 외부 라이브러리에 메일 보내는 사람 인증 여부 설정
+        log.info("toMail : " + toMail);
+        log.info("title : " + title);
+        log.info("contents : " + contents);
 
-        // 네이버 SMTP서버 인증 처리 로직
-        Session session = Session.getDefaultInstance(props, new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password);
-            }
-        });
+        // 메일 발송 메시지 구조(파일 첨부 가능)
+        MimeMessage message = mailSender.createMimeMessage();
+
+        // 메일 발송 메시지 구조를 쉽게 생성하게 도와주는 객체
+        MimeMessageHelper messageHelper = new MimeMessageHelper(message, "UTF-8");
 
         try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(user));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(toMail));
 
-            // 메일 제목
-            message.setSubject(CmmUtil.nvl(pDTO.getTitle()));
+            messageHelper.setTo(toMail); // 받는 사람
+            messageHelper.setFrom(fromMail); // 보내는 사람
+            messageHelper.setSubject(title); // 메일 제목
+            messageHelper.setText(contents); // 메일 내용
 
-            // 메일 내용
-            message.setText(CmmUtil.nvl(pDTO.getContents()));
-
-            // 메일발송
-            Transport.send(message);
-
-        } catch (MessagingException e) { //메일 전송 관련 에러 다 잡기
-            res = 0; // 메일 발송이 실패해기 때문에 0으로 변경
-            log.info("[ERROR] " + this.getClass().getName() + ".doSendMail : " + e);
+            mailSender.send(message);
 
         } catch (Exception e) {//모든 에러 다 잡기
             res = 0; // 메일 발송이 실패해기 때문에 0으로 변경
