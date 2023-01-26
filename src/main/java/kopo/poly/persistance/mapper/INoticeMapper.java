@@ -12,7 +12,7 @@ public interface INoticeMapper {
 	List<NoticeDTO> getNoticeList() throws Exception;
 	
 	//게시판 글 등록
-	void InsertNoticeInfo(NoticeDTO pDTO) throws Exception;
+	void insertNoticeInfo(NoticeDTO pDTO) throws Exception;
 	
 	//게시판 상세보기
 	NoticeDTO getNoticeInfo(NoticeDTO pDTO) throws Exception;

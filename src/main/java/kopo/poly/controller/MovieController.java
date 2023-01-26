@@ -4,24 +4,26 @@ import kopo.poly.dto.MovieDTO;
 import kopo.poly.service.IMovieService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
-@RequestMapping(value="/movie")
+@RequestMapping(value = "/movie")
+@RequiredArgsConstructor
 @Controller
 public class MovieController {
 
-    @Resource(name = "MovieService")
-    private IMovieService movieService;
+    private final IMovieService movieService;
 
     /**
      * CGV 영화 수집을 위한 URL 호출
@@ -58,7 +60,8 @@ public class MovieController {
         MovieDTO pDTO = new MovieDTO();
         pDTO.setCollect_time(collectTime);
 
-        List<MovieDTO> rList = movieService.getMovieInfo(pDTO);
+        // 수집된 영화 정보 조회하기
+        List<MovieDTO> rList = Optional.ofNullable(movieService.getMovieInfo(pDTO)).orElseGet(ArrayList::new);
 
         // 조회 결과를 JSP에 전달하기
         model.addAttribute("rList", rList);

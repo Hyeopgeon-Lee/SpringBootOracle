@@ -14,7 +14,7 @@ import javax.mail.internet.MimeMessage;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("MailService")
+@Service
 public class MailService implements IMailService {
 
     private final JavaMailSender mailSender;

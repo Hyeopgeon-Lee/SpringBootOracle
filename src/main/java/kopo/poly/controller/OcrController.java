@@ -5,6 +5,7 @@ import kopo.poly.service.IOcrService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
 import kopo.poly.util.FileUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,19 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.io.File;
+import java.util.Optional;
 
 @Slf4j
-@RequestMapping(value="/ocr")
+@RequestMapping(value = "/ocr")
+@RequiredArgsConstructor
 @Controller
 public class OcrController {
 
-    /*
-     * 비즈니스 로직(중요 로직을 수행하기 위해 사용되는 서비스를 메모리에 적재(싱글톤패턴 적용됨)
-     */
-    @Resource(name = "OcrService")
-    private IOcrService ocrService;
+    private final IOcrService ocrService;
 
     // 업로드되는 파일이 저장되는 기본 폴더 설정(자바에서 경로는 /로 표현함)
     final private String FILE_UPLOAD_SAVE_PATH = "c:/upload"; // C:\\upload 폴더에 저장
@@ -33,7 +31,7 @@ public class OcrController {
     /**
      * 이미지 인식을 위한 파일업로드 화면 호출
      */
-    @RequestMapping(value="uploadImage")
+    @RequestMapping(value = "uploadImage")
     public String uploadImage() {
         log.info(this.getClass().getName() + ".uploadImage!");
 
@@ -71,7 +69,7 @@ public class OcrController {
             // 웹서버에 업로드한 파일 저장하는 물리적 경로
             String saveFilePath = FileUtil.mkdirForDate(FILE_UPLOAD_SAVE_PATH);
 
-            String fullFileInfo = saveFilePath + "/"+ saveFileName;
+            String fullFileInfo = saveFilePath + "/" + saveFileName;
 
             // 정상적으로 값이 생성되었는지 로그 찍어서 확인
             log.info("ext : " + ext);
@@ -87,21 +85,17 @@ public class OcrController {
             pDTO.setFileName(saveFileName); // 저장되는 파일명
             pDTO.setFilePath(saveFilePath); // 저장되는 경로
             pDTO.setExt(ext); // 확장자
-            pDTO.setOrg_file_name(originalFileName);; // 원래이름
+            pDTO.setOrg_file_name(originalFileName); // 원래이름
             pDTO.setReg_id("admin");
 
-            OcrDTO rDTO = ocrService.getReadforImageText(pDTO);
-
-            if (rDTO == null) {
-                rDTO = new OcrDTO();
-            }
+            OcrDTO rDTO = Optional.ofNullable(ocrService.getReadforImageText(pDTO)).orElseGet(OcrDTO::new);
 
             res = CmmUtil.nvl(rDTO.getTextFromImage());
 
             rDTO = null;
             pDTO = null;
 
-        }else {
+        } else {
             res = "이미지 파일이 아니라서 인식이 불가능합니다.";
 
         }

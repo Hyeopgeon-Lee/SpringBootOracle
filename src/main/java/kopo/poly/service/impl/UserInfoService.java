@@ -12,22 +12,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("UserInfoService")
+@Service
 public class UserInfoService implements IUserInfoService {
 
-    // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
-    // userInfoMapper 변수에 이미 메모리에 올라간 Mapper 객체를 넣어줌
-    // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
-    private final IUserInfoMapper userInfoMapper;
+    private final IUserInfoMapper userInfoMapper; // 회원관련 SQL 사용하기 위한 Mapper 가져오기
 
-    //메일 발송을 위한 MailService 자바 객체 가져오기
-    @Resource(name = "MailService")
-    private IMailService mailService;
-
+    private final IMailService mailService; //메일 발송을 위한 MailService 자바 객체 가져오기
 
     @Override
     public int insertUserInfo(UserInfoDTO pDTO) throws Exception {
@@ -35,18 +29,9 @@ public class UserInfoService implements IUserInfoService {
         // 회원가입 성공 : 1, 아이디 중복으로인한 가입 취소 : 2, 기타 에러 발생 : 0
         int res = 0;
 
-        // controller에서 값이 정상적으로 못 넘어오는 경우를 대비하기 위해 사용함
-        if (pDTO == null) {
-            pDTO = new UserInfoDTO();
-        }
-
         // 회원 가입 중복 방지를 위해 DB에서 데이터 조회
-        UserInfoDTO rDTO = userInfoMapper.getUserExists(pDTO);
-
-        // mapper에서 값이 정상적으로 못 넘어오는 경우를 대비하기 위해 사용함
-        if (rDTO == null) {
-            rDTO = new UserInfoDTO();
-        }
+        // userInfoMapper.getUserExists(pDTO) 함수 실행 결과가 NUll 발생하면, UserInfoDTO 메모리에 올리기
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getUserExists(pDTO)).orElseGet(UserInfoDTO::new);
 
         // 중복된 회원정보가 있는 경우, 결과값을 2로 변경하고, 더 이상 작업을 진행하지 않음
         if (CmmUtil.nvl(rDTO.getExists_yn()).equals("Y")) {
@@ -110,12 +95,8 @@ public class UserInfoService implements IUserInfoService {
         int res = 0;
 
         // 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 위한 mapper 호출하기
-        UserInfoDTO rDTO = userInfoMapper.getUserLoginCheck(pDTO);
-
-        if (rDTO == null) {
-            rDTO = new UserInfoDTO();
-
-        }
+        // userInfoMapper.getUserLoginCheck(pDTO) 함수 실행 결과가 NUll 발생하면, UserInfoDTO 메모리에 올리기
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getUserLoginCheck(pDTO)).orElseGet(UserInfoDTO::new);
 
         /*
          * #######################################################

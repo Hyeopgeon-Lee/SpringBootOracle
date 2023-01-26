@@ -4,6 +4,7 @@ import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.EncryptUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -11,28 +12,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
-@RequestMapping(value="/user")
+@RequestMapping(value = "/user")
+@RequiredArgsConstructor
 @Controller
 public class UserInfoController {
 
-    /*
-     * 비즈니스 로직(중요 로직을 수행하기 위해 사용되는 서비스를 메모리에 적재(싱글톤패턴 적용됨)
-     * */
-    @Resource(name = "UserInfoService")
-    private IUserInfoService userInfoService;
-
+    private final IUserInfoService userInfoService;
 
     /**
      * 회원가입 화면으로 이동
      */
-    @GetMapping (value = "userRegForm")
+    @GetMapping(value = "userRegForm")
     public String userRegForm() {
-        log.info(this.getClass().getName() + ".user/userRegForm ok!");
+        log.info(this.getClass().getName() + ".user/userRegForm");
 
         return "/user/UserRegForm";
     }

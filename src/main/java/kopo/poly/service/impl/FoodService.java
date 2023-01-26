@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
-@Service("FoodService")
+@Service
 public class FoodService implements IFoodService {
 
     @Override

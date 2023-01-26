@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 
 @Slf4j
-@Service("OcrService")
+@Service
 public class OcrService implements IOcrService {
 
     /**
@@ -23,7 +23,7 @@ public class OcrService implements IOcrService {
     @Override
     public OcrDTO getReadforImageText(OcrDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".getFoodInfoFromWEB start!");
+        log.info(this.getClass().getName() + ".getReadforImageText start!");
 
         File imageFile = new File(CmmUtil.nvl(pDTO.getFilePath()) + "//" + CmmUtil.nvl(pDTO.getFileName()));
 
@@ -46,7 +46,7 @@ public class OcrService implements IOcrService {
 
         log.info("result : " + result);
 
-        log.info(this.getClass().getName() + ".getFoodInfoFromWEB End!");
+        log.info(this.getClass().getName() + ".getReadforImageText End!");
 
         return pDTO;
     }

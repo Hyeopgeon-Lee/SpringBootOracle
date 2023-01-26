@@ -14,13 +14,12 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service("MovieService")
+@Service
 public class MovieService implements IMovieService {
 
     // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
@@ -109,18 +108,10 @@ public class MovieService implements IMovieService {
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".getMovieInfo Start!");
 
-        // DB에서 조회하기
-        List<MovieDTO> rList = movieMapper.getMovieInfo(pDTO);
-
-        // DB 조회 결과가 없다면, NullPointer 에러 방지를 위해
-        // 데이터가 존재하는 않는 객체로 메모리에 올리기
-        if (rList == null) {
-            rList = new ArrayList<>();
-        }
-
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".getMovieInfo End!");
 
-        return rList;
+        // DB에서 조회하기
+        return movieMapper.getMovieInfo(pDTO);
     }
 }

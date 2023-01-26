@@ -1,47 +1,67 @@
 package kopo.poly.controller;
 
 import kopo.poly.dto.MailDTO;
+import kopo.poly.dto.MsgDTO;
 import kopo.poly.service.IMailService;
 import kopo.poly.util.CmmUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
+@RequestMapping(value = "/mail")
+@RequiredArgsConstructor
 @Controller
 public class MailController {
     /*
      * 비즈니스 로직(중요 로직을 수행하기 위해 사용되는 서비스를 메모리에 적재(싱글톤패턴 적용됨) 메일 발송을 위한 로직을 구현
      */
-    @Resource(name = "MailService")
-    private IMailService mailService;
+    private final IMailService mailService;
 
     /**
      * 메일 발송하기폼
      */
-    @GetMapping(value = "mail/mailForm")
+    @GetMapping(value = "mailForm")
     public String mailForm() throws Exception {
+
+        // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
+        log.info(this.getClass().getName() + "mailForm Start!");
+
         return "/mail/mailForm";
     }
 
     /**
      * 메일 발송하기
      */
-    @PostMapping(value = "mail/sendMail")
-    public String sendMail(HttpServletRequest request, ModelMap model) throws Exception {
+    @ResponseBody
+    @PostMapping(value = "sendMail")
+    public MsgDTO sendMail(HttpServletRequest request, ModelMap model) throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + "mail.sendMail start!");
+        log.info(this.getClass().getName() + ".sendMail Start!");
+
+        String msg = ""; // 발송 결과 메시지
 
         // 웹 URL로부터 전달받는 값들
         String toMail = CmmUtil.nvl(request.getParameter("toMail")); // 받는사람
         String title = CmmUtil.nvl(request.getParameter("title")); // 제목
         String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
+
+        /*
+         * ####################################################################################
+         * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
+         * ####################################################################################
+         */
+        log.info("toMail : " + toMail);
+        log.info("title : " + title);
+        log.info("contents : " + contents);
 
         // 메일 발송할 정보 넣기 위한 DTO객체 생성하기
         MailDTO pDTO = new MailDTO();
@@ -54,22 +74,23 @@ public class MailController {
         //메일방송하기
         int res = mailService.doSendMail(pDTO);
 
-        if (res==1) { //메일발송 성공
-            log.info(this.getClass().getName() + "mail.sendMail success!!!");
+        if (res == 1) { //메일발송 성공
+            msg = "메일 발송하였습니다.";
 
-        }else { //메일발송 실패
-            log.info(this.getClass().getName() + "mail.sendMail fail!!!");
-
+        } else { //메일발송 실패
+            msg = "메일 발송 실패하였습니다.";
         }
 
-        //메일 발송 결과를 JSP에 전달하기(데이터 전달시, 숫자보단 문자열이 컨트롤하기 편리하기 때문에 강제로 숫자를 문자로 변환함)
-        model.addAttribute("res", String.valueOf(res));
+        log.info(msg);
+
+        // 결과 메시지 전달하기
+        MsgDTO dto = new MsgDTO();
+        dto.setMsg(msg);
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + "mail.sendMail end!");
+        log.info(this.getClass().getName() + ".sendMail End!");
 
-        // 함수 처리가 끝나고 보여줄 JSP 파일명(/WEB-INF/view//mail/sendMailResult.jsp)
-        return "/mail/sendMailResult";
+        return dto;
     }
 }
 
