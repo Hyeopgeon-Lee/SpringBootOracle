@@ -1,22 +1,24 @@
 package kopo.poly.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class UserInfoDTO {
 
-    private String user_id;
-    private String user_name;
+    private String userId;
+    private String userName;
     private String password;
     private String email;
     private String addr1;
     private String addr2;
-    private String reg_id;
-    private String reg_dt;
-    private String chg_id;
-    private String chg_dt;
+    private String regId;
+    private String regDt;
+    private String chgId;
+    private String chgDt;
 
     // 회원가입시, 중복가입을 방지 위해 사용할 변수
     // DB를 조회해서 회원이 존재하면 Y값을 반환함

@@ -38,6 +38,16 @@ public class MovieService implements IMovieService {
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".collectMovieRank Start!");
 
+        String collectTime = DateUtil.getDateTime("yyyyMMdd"); // 수집날짜 = 오늘 날짜
+
+        MovieDTO pDTO = new MovieDTO();
+        pDTO.setCollectTime(collectTime);
+
+        // 기존에 수집된 영화 순위 데이터 삭제하기
+        movieMapper.deleteMovieInfo(pDTO);
+
+        pDTO = null; // 기존 등록된 영화 순위 삭제 후, pDTO 값 제거하기
+
         int res = 0; //크롤링 결과 (0보다 크면 크롤링 성공)
 
         // CGV 영화 순위 정보 가져올 사이트 주소
@@ -61,7 +71,6 @@ public class MovieService implements IMovieService {
         Iterator<Element> score = element.select("span.percent").iterator(); //점수
         Iterator<Element> open_day = element.select("span.txt-info").iterator(); //개봉일
 
-        MovieDTO pDTO = null;
 
         //수집된 데이터 DB에 저장하기
         while (movie_rank.hasNext()) {
@@ -69,30 +78,30 @@ public class MovieService implements IMovieService {
             pDTO = new MovieDTO(); //수집된 영화정보를 DTO에 저장하기 위해 메모리에 올리기
 
             //수집시간을 기본키(pk)로 사용
-            pDTO.setCollect_time(DateUtil.getDateTime("yyyyMMddhhmmss"));
+            pDTO.setCollectTime(collectTime);
 
             //영화 순위(trim 함수 추가 이유 : trim 함수는 글자의 앞뒤 공백 삭제 역할을 수행하여,데이터 수집시,
             // 홈페이지 개발자들을 앞뒤 공백 집어넣을 수 있어서 추가)
             String rank = CmmUtil.nvl(movie_rank.next().text()).trim();  //No.1 들어옴
-            pDTO.setMovie_rank(rank.substring(3, rank.length()));
+            pDTO.setMovieRank(rank.substring(3, rank.length()));
 
             //영화 제목
-            pDTO.setMovie_nm(CmmUtil.nvl(movie_name.next().text()).trim());
+            pDTO.setMovieNm(CmmUtil.nvl(movie_name.next().text()).trim());
 
             //영화 예매율
-            pDTO.setMovie_reserve(CmmUtil.nvl(movie_reserve.next().text()).trim());
+            pDTO.setMovieReserve(CmmUtil.nvl(movie_reserve.next().text()).trim());
 
             //영화 점수
             pDTO.setScore(CmmUtil.nvl(score.next().text()).trim());
 
             //수집되는 데이터가 '2019.10.23 개봉'이기 때문에 앞에 10자리(2019.10.23)만 저장
-            pDTO.setOpen_day(CmmUtil.nvl(open_day.next().text()).trim().substring(0, 10));
+            pDTO.setOpenDay(CmmUtil.nvl(open_day.next().text()).trim().substring(0, 10));
 
             //등록자
-            pDTO.setReg_id("admin");
+            pDTO.setRegId("admin");
 
             //영화 한개씩 추가
-            res += movieMapper.InsertMovieInfo(pDTO);
+            res += movieMapper.insertMovieInfo(pDTO);
 
         }
 
@@ -103,15 +112,22 @@ public class MovieService implements IMovieService {
     }
 
     @Override
-    public List<MovieDTO> getMovieInfo(MovieDTO pDTO) throws Exception {
+    public List<MovieDTO> getMovieInfo() throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".getMovieInfo Start!");
 
+        String collectTime = DateUtil.getDateTime("yyyyMMdd"); // 수집날짜 = 오늘 날짜
+
+        MovieDTO pDTO = new MovieDTO();
+        pDTO.setCollectTime(collectTime);
+
+        // DB에서 조회하기
+        List<MovieDTO> rList = movieMapper.getMovieInfo(pDTO);
+
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".getMovieInfo End!");
 
-        // DB에서 조회하기
-        return movieMapper.getMovieInfo(pDTO);
+        return rList;
     }
 }

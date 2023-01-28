@@ -1,8 +1,12 @@
 package kopo.poly.service;
 
 import kopo.poly.dto.UserInfoDTO;
+import org.apache.catalina.User;
 
 public interface IUserInfoService {
+
+    // 아이디 중복 체크
+    UserInfoDTO getUserExists(UserInfoDTO pDTO) throws Exception;
 
     // 회원 가입하기(회원정보 등록하기)
     int insertUserInfo(UserInfoDTO pDTO) throws Exception;

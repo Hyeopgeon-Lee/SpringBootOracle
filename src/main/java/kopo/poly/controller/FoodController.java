@@ -8,7 +8,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequestMapping(value = "/food")
@@ -16,7 +18,7 @@ import java.util.List;
 @Controller
 public class FoodController {
 
-    private final IFoodService foodService;
+    private final IFoodService foodService; // Food 서비스 객체 주입하기
 
     /**
      * 서울강서캠퍼스 식단 수집을 위한 URL 호출
@@ -26,7 +28,8 @@ public class FoodController {
 
         log.info(this.getClass().getName() + ".collectFood Start!");
 
-        List<FoodDTO> rList = foodService.toDayFood();
+        // foodService.toDayFood() 결과를 Null 값 체크하여 rList 객체에 저장하기
+        List<FoodDTO> rList = Optional.ofNullable(foodService.toDayFood()).orElseGet(ArrayList::new);
 
         //크롤링 결과를 넣어주기
         model.addAttribute("rList", rList);

@@ -6,6 +6,7 @@ import kopo.poly.util.CmmUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -13,6 +14,9 @@ import java.io.File;
 @Slf4j
 @Service
 public class OcrService implements IOcrService {
+
+    @Value("${orc.model.data}")
+    private String ocrModel;
 
     /**
      * 이미지 파일로부터 문자 읽어 오기
@@ -32,7 +36,7 @@ public class OcrService implements IOcrService {
 
         // OCR 분석에 필요한 기준 데이터(이미 각 나라의 언어별로 학습시킨 데이터 위치 폴더)
         // 저장 경로는 물리경로를 사용함(전체 경로)
-        instance.setDatapath("C:/model/tessdata");
+        instance.setDatapath(ocrModel);
 
         // 한국어 학습 데이터 선택(기본 값은 영어)
         instance.setLanguage("kor"); //한국어 설정

@@ -23,7 +23,7 @@ import java.util.Optional;
 @Controller
 public class MovieController {
 
-    private final IMovieService movieService;
+    private final IMovieService movieService; // 영화 서비스 객체 주입하기
 
     /**
      * CGV 영화 수집을 위한 URL 호출
@@ -37,11 +37,11 @@ public class MovieController {
         int res = movieService.collectMovieRank();
 
         //크롤링 결과를 넣어주기
-        model.addAttribute("res", String.valueOf(res));
+        model.addAttribute("msg", "CGV 홈페이지로부터 수집된 영화는 총 " + res + "건입니다.");
 
         log.info(this.getClass().getName() + ".collectMovieRank End!");
 
-        return "/movie/RankForWEB";
+        return "/movie/collectMovieRank";
     }
 
 
@@ -51,17 +51,8 @@ public class MovieController {
 
         log.info(this.getClass().getName() + ".getMovieRank Start!");
 
-        // 가져올 날짜 파라미터로 받기
-        // 파라미터의 값이 없다면, 오늘 날짜로 데이터 받기
-        String collectTime = CmmUtil.nvl(request.getParameter("collectTime"), DateUtil.getDateTime("yyyyMMdd"));
-
-        log.info("collectTime : " + collectTime); // 반드시 로그 찍자!
-
-        MovieDTO pDTO = new MovieDTO();
-        pDTO.setCollect_time(collectTime);
-
         // 수집된 영화 정보 조회하기
-        List<MovieDTO> rList = Optional.ofNullable(movieService.getMovieInfo(pDTO)).orElseGet(ArrayList::new);
+        List<MovieDTO> rList = Optional.ofNullable(movieService.getMovieInfo()).orElseGet(ArrayList::new);
 
         // 조회 결과를 JSP에 전달하기
         model.addAttribute("rList", rList);

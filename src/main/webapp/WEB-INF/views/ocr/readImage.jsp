@@ -11,23 +11,20 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>이미지로부터 텍스트 인식 결과</title>
+    <title>이미지 파일로부터 인식된 문자열 읽어주기</title>
+    <link rel="stylesheet" href="/css/table.css"/>
     <script>
 
         // Controller에서 보내준 인식된 문자열, Javascript 언어에서 활용하기 위해 변수 생성함
         const myOcrText = "<%=res%>";
 
-        // 화면 로딩인 완전히 종료(</html>까지 읽은 다음) 실행됨
-        window.onload = function () {
-
-            // html의 btnTextRead id의 버튼 객체 가져오기
-            const btnTextRead = document.getElementById("btnTextRead");
-
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            btnTextRead.addEventListener("click", e => {
+            $("#btnTextRead").on("click", function () {
                 speak(myOcrText); // 인식된 문자열 읽어주기
             })
-        }
+        })
 
         // 문자열 읽기 함수
         function speak(text) {
@@ -52,9 +49,23 @@
 <body>
 <h2>이미지 파일로부터 인식된 문자열 읽어주기</h2>
 <hr/>
-이미지로부터 텍스트 인식 결과는 다음과 같습니다.<br/>
-<%=res%> <br/><br/>
-<button id="btnTextRead">문자열 읽기</button>
+<br/>
+<div class="divTable minimalistBlack">
+    <div class="divTableHeading">
+        <div class="divTableRow">
+            <div class="divTableHead">이미지로부터 텍스트 인식 결과</div>
+        </div>
+    </div>
+    <div class="divTableBody">
+        <div class="divTableRow">
+            <div class="divTableCell"><%=res%>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <button id="btnTextRead" type="button">문자열 읽기</button>
+</div>
 </body>
 </html>
 

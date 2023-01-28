@@ -1,5 +1,6 @@
 package kopo.poly.controller;
 
+import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
@@ -11,9 +12,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.html.Option;
+import java.util.Optional;
 
 @Slf4j
 @RequestMapping(value = "/user")
@@ -33,17 +37,43 @@ public class UserInfoController {
         return "/user/UserRegForm";
     }
 
+    /**
+     * 회원 가입 전 아이디 중복체크하기(Ajax를 통해 입력한 아이디 정보 받음)
+     */
+    @ResponseBody
+    @PostMapping(value = "getUserExists")
+    public UserInfoDTO getUserExists(HttpServletRequest request) throws Exception {
+
+        log.info(this.getClass().getName() + ".getUserExists Start!");
+
+        String userId = CmmUtil.nvl(request.getParameter("userId")); // 회원아이디
+
+        log.info("userId : " + userId);
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserId(userId);
+
+        // 회원아이디를 통해 중복된 아이디인지 조회
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserExists(pDTO)).orElseGet(UserInfoDTO::new);
+
+        log.info(this.getClass().getName() + ".getUserExists End!");
+
+        return rDTO;
+    }
+
 
     /**
      * 회원가입 로직 처리
      */
+    @ResponseBody
     @PostMapping(value = "insertUserInfo")
-    public String insertUserInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    public MsgDTO insertUserInfo(HttpServletRequest request, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".insertUserInfo start!");
 
-        //회원가입 결과에 대한 메시지를 전달할 변수
-        String msg = "";
+        int res = 0; // 회원가입 결과
+        String msg = ""; //회원가입 결과에 대한 메시지를 전달할 변수
+        MsgDTO dto = null; // 결과 메시지 구조
 
         //웹(회원정보 입력화면)에서 받는 정보를 저장할 변수
         UserInfoDTO pDTO = null;
@@ -84,7 +114,6 @@ public class UserInfoController {
             log.info("addr1 : " + addr1);
             log.info("addr2 : " + addr2);
 
-
             /*
              * #######################################################
              *        웹(회원정보 입력화면)에서 받는 정보를 DTO에 저장하기 시작!!
@@ -93,12 +122,11 @@ public class UserInfoController {
              * #######################################################
              */
 
-
             //웹(회원정보 입력화면)에서 받는 정보를 저장할 변수를 메모리에 올리기
             pDTO = new UserInfoDTO();
 
-            pDTO.setUser_id(user_id);
-            pDTO.setUser_name(user_name);
+            pDTO.setUserId(user_id);
+            pDTO.setUserName(user_name);
 
             //비밀번호는 절대로 복호화되지 않도록 해시 알고리즘으로 암호화함
             pDTO.setPassword(EncryptUtil.encHashSHA256(password));
@@ -119,7 +147,7 @@ public class UserInfoController {
             /*
              * 회원가입
              * */
-            int res = userInfoService.insertUserInfo(pDTO);
+            res = userInfoService.insertUserInfo(pDTO);
 
             log.info("회원가입 결과(res) : " + res);
 
@@ -128,7 +156,7 @@ public class UserInfoController {
 
                 //추후 회원가입 입력화면에서 ajax를 활용해서 아이디 중복, 이메일 중복을 체크하길 바람
             } else if (res == 2) {
-                msg = "이미 가입된 이메일 주소입니다.";
+                msg = "이미 가입된 아이디입니다.";
 
             } else {
                 msg = "오류로 인해 회원가입이 실패하였습니다.";
@@ -142,44 +170,42 @@ public class UserInfoController {
             e.printStackTrace();
 
         } finally {
-            log.info(this.getClass().getName() + ".insertUserInfo end!");
+            // 결과 메시지 전달하기
+            dto = new MsgDTO();
+            dto.setResult(res);
+            dto.setMsg(msg);
 
-
-            //회원가입 여부 결과 메시지 전달하기
-            model.addAttribute("msg", msg);
-
-            //회원가입 여부 결과 메시지 전달하기
-            model.addAttribute("pDTO", pDTO);
-
-            //변수 초기화(메모리 효율화 시키기 위해 사용함)
-            pDTO = null;
-
+            log.info(this.getClass().getName() + ".insertUserInfo End!");
         }
 
-        return "/user/UserRegSuccess";
+        return dto;
     }
-
 
     /**
      * 로그인을 위한 입력 화면으로 이동
      */
-    @GetMapping(value = "loginForm")
-    public String loginForm() {
-        log.info(this.getClass().getName() + ".user/loginForm ok!");
+    @GetMapping(value = "login")
+    public String login() {
+        log.info(this.getClass().getName() + ".user/login Start!");
 
-        return "/user/LoginForm";
+        log.info(this.getClass().getName() + ".user/login End!");
+
+        return "user/login";
     }
 
 
     /**
      * 로그인 처리 및 결과 알려주는 화면으로 이동
      */
-    @PostMapping(value = "getUserLoginCheck")
-    public String getUserLoginCheck(HttpSession session, HttpServletRequest request, ModelMap model) throws Exception {
-        log.info(this.getClass().getName() + ".getUserLoginCheck start!");
+    @ResponseBody
+    @PostMapping(value = "loginProc")
+    public MsgDTO loginProc(HttpServletRequest request, HttpSession session) throws Exception {
 
-        //로그인 처리 결과를 저장할 변수 (로그인 성공 : 1, 아이디, 비밀번호 불일치로인한 실패 : 0, 시스템 에러 : 2)
-        int res = 0;
+        log.info(this.getClass().getName() + ".loginProc Start!");
+
+        int res = 0; //로그인 처리 결과를 저장할 변수 (로그인 성공 : 1, 아이디, 비밀번호 불일치로인한 실패 : 0, 시스템 에러 : 2)
+        String msg = ""; //로그인 결과에 대한 메시지를 전달할 변수
+        MsgDTO dto = null; // 결과 메시지 구조
 
         //웹(회원정보 입력화면)에서 받는 정보를 저장할 변수
         UserInfoDTO pDTO = null;
@@ -226,7 +252,7 @@ public class UserInfoController {
             //웹(회원정보 입력화면)에서 받는 정보를 저장할 변수를 메모리에 올리기
             pDTO = new UserInfoDTO();
 
-            pDTO.setUser_id(user_id);
+            pDTO.setUserId(user_id);
 
             //비밀번호는 절대로 복호화되지 않도록 해시 알고리즘으로 암호화함
             pDTO.setPassword(EncryptUtil.encHashSHA256(password));
@@ -265,29 +291,42 @@ public class UserInfoController {
                  *
                  * Session 단어에서 SS를 가져온 것이다.
                  */
+                msg = "로그인이 성공했습니다.";
                 session.setAttribute("SS_USER_ID", user_id);
+
+            } else {
+                msg = "아이디와 비밀번호가 올바르지 않습니다.";
+
             }
 
         } catch (Exception e) {
             //저장이 실패되면 사용자에게 보여줄 메시지
+            msg = "시스템 문제로 로그인이 실패했습니다.";
             res = 2;
             log.info(e.toString());
             e.printStackTrace();
 
         } finally {
-            log.info(this.getClass().getName() + ".insertUserInfo end!");
+            // 결과 메시지 전달하기
+            dto = new MsgDTO();
+            dto.setResult(res);
+            dto.setMsg(msg);
 
-            /* 로그인 처리 결과를 jsp에 전달하기 위해 변수 사용
-             * 숫자 유형의 데이터 타입은 값을 전달하고 받는데 불편함이  있어
-             * 문자 유형(String)으로 강제 형변환하여 jsp에 전달한다.
-             * */
-            model.addAttribute("res", String.valueOf(res));
-
-            //변수 초기화(메모리 효율화 시키기 위해 사용함)
-            pDTO = null;
-
+            log.info(this.getClass().getName() + ".loginProc End!");
         }
 
-        return "/user/LoginResult";
+        return dto;
+    }
+
+    /**
+     * 로그인 성공 페이지 이동
+     */
+    @GetMapping(value = "loginSuccess")
+    public String loginSuccess() {
+        log.info(this.getClass().getName() + ".user/loginSuccess Start!");
+
+        log.info(this.getClass().getName() + ".user/loginSuccess End!");
+
+        return "user/loginSuccess";
     }
 }

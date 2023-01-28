@@ -85,12 +85,13 @@ public class OcrController {
             pDTO.setFileName(saveFileName); // 저장되는 파일명
             pDTO.setFilePath(saveFilePath); // 저장되는 경로
             pDTO.setExt(ext); // 확장자
-            pDTO.setOrg_file_name(originalFileName); // 원래이름
-            pDTO.setReg_id("admin");
+            pDTO.setOrgFileName(originalFileName); // 원래이름
+            pDTO.setRegId("admin");
 
+            // ocrService.getReadforImageText(pDTO) 결과를 Null 값 체크하여 rDTO 객체에 저장하기
             OcrDTO rDTO = Optional.ofNullable(ocrService.getReadforImageText(pDTO)).orElseGet(OcrDTO::new);
 
-            res = CmmUtil.nvl(rDTO.getTextFromImage());
+            res = CmmUtil.nvl(rDTO.getTextFromImage()); // 인식 결과
 
             rDTO = null;
             pDTO = null;
