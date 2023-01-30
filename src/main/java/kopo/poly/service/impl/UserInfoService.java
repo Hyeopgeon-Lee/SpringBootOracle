@@ -158,4 +158,29 @@ public class UserInfoService implements IUserInfoService {
 
         return res;
     }
+
+    @Override
+    public UserInfoDTO searchUserIdOrPasswordProc(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + ".searchUserId Start!");
+
+        UserInfoDTO rDTO = userInfoMapper.getUserId(pDTO);
+
+        log.info(this.getClass().getName() + ".searchUserId End!");
+
+        return rDTO;
+    }
+
+    @Override
+    public int newPasswordProc(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + ".newPasswordProc Start!");
+
+        // 비밀번호 재설정
+        int success = userInfoMapper.updatePassword(pDTO);
+
+        log.info(this.getClass().getName() + ".newPasswordProc End!");
+
+        return success;
+    }
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Slf4j
@@ -34,7 +33,7 @@ public class UserInfoController {
     public String userRegForm() {
         log.info(this.getClass().getName() + ".user/userRegForm");
 
-        return "/user/UserRegForm";
+        return "/user/userRegForm";
     }
 
     /**
@@ -67,7 +66,7 @@ public class UserInfoController {
      */
     @ResponseBody
     @PostMapping(value = "insertUserInfo")
-    public MsgDTO insertUserInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    public MsgDTO insertUserInfo(HttpServletRequest request) throws Exception {
 
         log.info(this.getClass().getName() + ".insertUserInfo start!");
 
@@ -199,7 +198,7 @@ public class UserInfoController {
      */
     @ResponseBody
     @PostMapping(value = "loginProc")
-    public MsgDTO loginProc(HttpServletRequest request, HttpSession session) throws Exception {
+    public MsgDTO loginProc(HttpServletRequest request, HttpSession session) {
 
         log.info(this.getClass().getName() + ".loginProc Start!");
 
@@ -329,4 +328,208 @@ public class UserInfoController {
 
         return "user/loginSuccess";
     }
+
+    /**
+     * 아아디 찾기 화면
+     */
+    @GetMapping(value = "searchUserId")
+    public String searchUserId() {
+        log.info(this.getClass().getName() + ".user/searchUserId Start!");
+
+        log.info(this.getClass().getName() + ".user/searchUserId End!");
+
+        return "user/searchUserId";
+
+    }
+
+    /**
+     * 아아디 찾기 로직 수행
+     */
+    @PostMapping(value = "searchUserIdProc")
+    public String searchUserIdProc(HttpServletRequest request, ModelMap model) throws Exception {
+        log.info(this.getClass().getName() + ".user/searchUserIdProc Start!");
+
+        /*
+         * ########################################################################
+         *        웹(회원정보 입력화면)에서 받는 정보를 String 변수에 저장!!
+         *
+         *    무조건 웹으로 받은 정보는 DTO에 저장하기 위해 임시로 String 변수에 저장함
+         * ########################################################################
+         */
+
+        String userName = CmmUtil.nvl(request.getParameter("userName")); // 이름
+        String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
+
+        /*
+         * ########################################################################
+         * 	 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함
+         * 						반드시 작성할 것
+         * ########################################################################
+         * */
+        log.info("userName : " + userName);
+        log.info("email : " + email);
+
+        /*
+         * ########################################################################
+         *        웹(회원정보 입력화면)에서 받는 정보를 DTO에 저장하기!!
+         *
+         *        무조건 웹으로 받은 정보는 DTO에 저장해야 한다고 이해하길 권함
+         * ########################################################################
+         */
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserName(userName);
+        pDTO.setEmail(email);
+
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.searchUserIdOrPasswordProc(pDTO)).orElseGet(UserInfoDTO::new);
+
+        model.addAttribute("rDTO", rDTO);
+
+        log.info(this.getClass().getName() + ".user/searchUserIdProc End!");
+
+        return "user/searchUserIdResult";
+
+    }
+
+
+    /**
+     * 비밀번호 찾기 화면
+     */
+    @GetMapping(value = "searchPassword")
+    public String searchPassword() {
+        log.info(this.getClass().getName() + ".user/searchPassword Start!");
+
+        log.info(this.getClass().getName() + ".user/searchPassword End!");
+
+        return "user/searchPassword";
+
+    }
+
+    /**
+     * 비밀번호 찾기 로직 수행
+     * <p>
+     * 아이디, 이름, 이메일 일치하면, 비밀번호 재발급 화면 이동
+     */
+    @PostMapping(value = "searchPasswordProc")
+    public String searchPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
+        log.info(this.getClass().getName() + ".user/searchPasswordProc Start!");
+
+        /*
+         * ########################################################################
+         *        웹(회원정보 입력화면)에서 받는 정보를 String 변수에 저장!!
+         *
+         *    무조건 웹으로 받은 정보는 DTO에 저장하기 위해 임시로 String 변수에 저장함
+         * ########################################################################
+         */
+
+        String userId = CmmUtil.nvl(request.getParameter("userId")); // 아이디
+        String userName = CmmUtil.nvl(request.getParameter("userName")); // 이름
+        String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
+
+        /*
+         * ########################################################################
+         * 	 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함
+         * 						반드시 작성할 것
+         * ########################################################################
+         * */
+        log.info("userId : " + userId);
+        log.info("userName : " + userName);
+        log.info("email : " + email);
+
+        /*
+         * ########################################################################
+         *        웹(회원정보 입력화면)에서 받는 정보를 DTO에 저장하기!!
+         *
+         *        무조건 웹으로 받은 정보는 DTO에 저장해야 한다고 이해하길 권함
+         * ########################################################################
+         */
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setUserId(userId);
+        pDTO.setUserName(userName);
+        pDTO.setEmail(email);
+
+        // 비밀번호 찾기 가능한지 확인하기
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.searchUserIdOrPasswordProc(pDTO)).orElseGet(UserInfoDTO::new);
+
+        model.addAttribute("rDTO", rDTO);
+
+        // 비밀번호 재생성하는 화면은 보안을 위해 반드시 NEW_PASSWORD 세션이 존재해야 접속 가능하도록 구현
+        // userId 값을 넣은 이유는 비밀번호 재설정하는 newPasswordProc 함수에서 사용하기 위함
+        session.setAttribute("NEW_PASSWORD", userId);
+
+        log.info(this.getClass().getName() + ".user/searchPasswordProc End!");
+
+        return "user/newPassword";
+
+    }
+
+    /**
+     * 비밀번호 찾기 로직 수행
+     * <p>
+     * 아이디, 이름, 이메일 일치하면, 비밀번호 재발급 화면 이동
+     */
+    @PostMapping(value = "newPasswordProc")
+    public String newPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".user/newPasswordProc Start!");
+
+        String msg = ""; // 웹에 보여줄 메시지
+
+        // 정상적인 접근인지 체크
+        String newPassword = CmmUtil.nvl((String) session.getAttribute("NEW_PASSWORD"));
+
+        if (newPassword.length() > 0) { //정상 접근
+
+            /*
+             * ########################################################################
+             *        웹(회원정보 입력화면)에서 받는 정보를 String 변수에 저장!!
+             *
+             *    무조건 웹으로 받은 정보는 DTO에 저장하기 위해 임시로 String 변수에 저장함
+             * ########################################################################
+             */
+
+            String password = CmmUtil.nvl(request.getParameter("password")); // 신규 비밀번호
+
+            /*
+             * ########################################################################
+             * 	 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함
+             * 						반드시 작성할 것
+             * ########################################################################
+             * */
+            log.info("password : " + password);
+
+            /*
+             * ########################################################################
+             *        웹(회원정보 입력화면)에서 받는 정보를 DTO에 저장하기!!
+             *
+             *        무조건 웹으로 받은 정보는 DTO에 저장해야 한다고 이해하길 권함
+             * ########################################################################
+             */
+
+            UserInfoDTO pDTO = new UserInfoDTO();
+            pDTO.setUserId(newPassword);
+            pDTO.setPassword(EncryptUtil.encHashSHA256(password));
+
+            userInfoService.newPasswordProc(pDTO);
+
+            // 비밀번호 재생성하는 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
+            session.setAttribute("NEW_PASSWORD", "");
+            session.removeAttribute("NEW_PASSWORD");
+
+            msg = "비밀번호가 재설정되었습니다.";
+
+        } else { // 비정상 접근
+            msg = "비정상 접근입니다.";
+        }
+
+        model.addAttribute("msg", msg);
+
+
+        log.info(this.getClass().getName() + ".user/newPasswordProc End!");
+
+        return "user/newPasswordResult";
+
+    }
+
 }

@@ -1,7 +1,6 @@
 package kopo.poly.service;
 
 import kopo.poly.dto.UserInfoDTO;
-import org.apache.catalina.User;
 
 public interface IUserInfoService {
 
@@ -13,4 +12,11 @@ public interface IUserInfoService {
 
     // 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기
     int getUserLoginCheck(UserInfoDTO pDTO) throws Exception;
+
+    // 아이디, 비밀번호 찾기에 활용
+    UserInfoDTO searchUserIdOrPasswordProc(UserInfoDTO pDTO) throws Exception;
+    
+    // 비밀번호 재설정
+    int newPasswordProc(UserInfoDTO pDTO) throws Exception;
+
 }

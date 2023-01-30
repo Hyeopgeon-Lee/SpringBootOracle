@@ -43,7 +43,7 @@
             </div>
             <div class="divTableRow">
                 <div class="divTableCell">메일제목</div>
-                <div class="divTableCell"><input type="text" name="toMail" maxlength="100" style="width: 95%"/>
+                <div class="divTableCell"><input type="text" name="title" maxlength="100" style="width: 95%"/>
                 </div>
             </div>
             <div class="divTableRow">
