@@ -4,6 +4,7 @@
 <%@ page import="kopo.poly.dto.NoticeDTO" %>
 <%@ page import="kopo.poly.util.CmmUtil" %>
 <%
+    // NoticeController 함수에서 model 객체에 저장된 값 불러오기
     List<NoticeDTO> rList = (List<NoticeDTO>) request.getAttribute("rList");
 %>
 <!DOCTYPE html>

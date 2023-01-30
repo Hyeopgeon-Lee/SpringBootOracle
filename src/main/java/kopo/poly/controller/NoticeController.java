@@ -59,14 +59,20 @@ public class NoticeController {
         List<NoticeDTO> rList = Optional.ofNullable(noticeService.getNoticeList())
                 .orElseGet(ArrayList::new);
 
+//        List<NoticeDTO> rList = noticeService.getNoticeList();
+//
+//        if (rList == null) {
+//            rList = new ArrayList<>();
+//        }
+
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rList", rList);
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".noticeList End!");
 
-        // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
-        // templates/notice/noticeList.html
+        // 함수 처리가 끝나고 보여줄 JSP 파일명
+        // webapp/WEB-INF/views/notice/noticeList.jsp
         return "notice/noticeList";
 
     }
@@ -85,8 +91,8 @@ public class NoticeController {
 
         log.info(this.getClass().getName() + ".noticeReg End!");
 
-        // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
-        // templates/notice/noticeReg.html
+        // 함수 처리가 끝나고 보여줄 JSP 파일명
+        // webapp/WEB-INF/views/notice/noticeReg.jsp
         return "notice/noticeReg";
     }
 
@@ -190,6 +196,8 @@ public class NoticeController {
 
         log.info(this.getClass().getName() + ".noticeInfo End!");
 
+        // 함수 처리가 끝나고 보여줄 JSP 파일명
+        // webapp/WEB-INF/views/notice/noticeInfo.jsp
         return "notice/noticeInfo";
     }
 
@@ -225,6 +233,8 @@ public class NoticeController {
 
         log.info(this.getClass().getName() + ".noticeEditInfo End!");
 
+        // 함수 처리가 끝나고 보여줄 JSP 파일명
+        // webapp/WEB-INF/views/notice/noticeEditInfo.jsp
         return "notice/noticeEditInfo";
     }
 
