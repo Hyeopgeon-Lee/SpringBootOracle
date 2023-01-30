@@ -53,7 +53,7 @@
                 <div class="divTableCell">이름
                 </div>
                 <div class="divTableCell">
-                    <input type="text" name="userName" id="user_id" style="width:95%"/>
+                    <input type="text" name="userName" id="userId" style="width:95%"/>
                 </div>
             </div>
             <div class="divTableRow">

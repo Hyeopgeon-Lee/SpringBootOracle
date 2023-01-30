@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,17 +25,54 @@ public class UserInfoService implements IUserInfoService {
     private final IMailService mailService; //메일 발송을 위한 MailService 자바 객체 가져오기
 
     @Override
-    public UserInfoDTO getUserExists(UserInfoDTO pDTO) throws Exception {
+    public UserInfoDTO getUserIdExists(UserInfoDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".getUserExists Start!");
+        log.info(this.getClass().getName() + ".getUserIdExists Start!");
 
-        UserInfoDTO rDTO = userInfoMapper.getUserExists(pDTO);
+        UserInfoDTO rDTO = userInfoMapper.getUserIdExists(pDTO);
 
-        log.info(this.getClass().getName() + ".getUserExists End!");
+        log.info(this.getClass().getName() + ".getUserIdExists End!");
 
         return rDTO;
     }
 
+    @Override
+    public UserInfoDTO getEmailExists(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + ".emailAuth Start!");
+
+        // 비밀번호 재설정
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getEmailExists(pDTO)).orElseGet(UserInfoDTO::new);
+
+        String existsYn = CmmUtil.nvl(rDTO.getExistsYn());
+
+        log.info("existsYn : " + existsYn);
+
+        if (existsYn.equals("N")) {
+
+            int authNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
+
+            log.info("authNumber : " + authNumber);
+
+            // 인증번호 발송 로직
+            MailDTO dto = new MailDTO();
+
+            dto.setTitle("이메일 중복 확인 인증번호 발송 메일");
+            dto.setContents("인증번호는 " + authNumber + " 입니다.");
+            dto.setToMail(CmmUtil.nvl(pDTO.getEmail()));
+
+            mailService.doSendMail(dto); // 이메일 발송
+
+            dto = null;
+
+            rDTO.setAuthNumber(authNumber); // 인증번호를 결과값에 넣어주기
+
+        }
+
+        log.info(this.getClass().getName() + ".emailAuth End!");
+
+        return rDTO;
+    }
     @Override
     public int insertUserInfo(UserInfoDTO pDTO) throws Exception {
 
@@ -183,4 +221,5 @@ public class UserInfoService implements IUserInfoService {
 
         return success;
     }
+
 }

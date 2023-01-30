@@ -4,8 +4,8 @@
 <mapper namespace="kopo.poly.persistance.mapper.IUserInfoMapper">
 
     <!-- 회원 가입 전 아이디 중복체크하기 -->
-    <select id="getUserExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
-        SELECT COUNT(1) AS EXISTS_YN
+    <select id="getUserIdExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+        SELECT DECODE(COUNT(1), 0, 'N', 'Y') AS EXISTS_YN
         FROM USER_INFO
         WHERE USER_ID = #{userId}
     </select>
@@ -68,5 +68,12 @@
         SET PASSWORD = #{password}
         WHERE USER_ID = #{userId}
     </update>
+
+    <!-- 회원 가입 전 이메일 중복체크하기 -->
+    <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+        SELECT DECODE(COUNT(1), 0, 'N', 'Y') AS EXISTS_YN
+        FROM USER_INFO
+        WHERE EMAIL = #{email}
+    </select>
 
 </mapper>

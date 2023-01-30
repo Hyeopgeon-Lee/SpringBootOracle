@@ -40,10 +40,10 @@ public class UserInfoController {
      * 회원 가입 전 아이디 중복체크하기(Ajax를 통해 입력한 아이디 정보 받음)
      */
     @ResponseBody
-    @PostMapping(value = "getUserExists")
+    @PostMapping(value = "getUserIdExists")
     public UserInfoDTO getUserExists(HttpServletRequest request) throws Exception {
 
-        log.info(this.getClass().getName() + ".getUserExists Start!");
+        log.info(this.getClass().getName() + ".getUserIdExists Start!");
 
         String userId = CmmUtil.nvl(request.getParameter("userId")); // 회원아이디
 
@@ -53,13 +53,36 @@ public class UserInfoController {
         pDTO.setUserId(userId);
 
         // 회원아이디를 통해 중복된 아이디인지 조회
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserExists(pDTO)).orElseGet(UserInfoDTO::new);
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO)).orElseGet(UserInfoDTO::new);
 
-        log.info(this.getClass().getName() + ".getUserExists End!");
+        log.info(this.getClass().getName() + ".getUserIdExists End!");
 
         return rDTO;
     }
 
+    /**
+     * 회원 가입 전 아이디 중복체크하기(Ajax를 통해 입력한 아이디 정보 받음)
+     */
+    @ResponseBody
+    @PostMapping(value = "getEmailExists")
+    public UserInfoDTO getEmailExists(HttpServletRequest request) throws Exception {
+
+        log.info(this.getClass().getName() + ".getEmailExists Start!");
+
+        String email = CmmUtil.nvl(request.getParameter("email")); // 회원아이디
+
+        log.info("email : " + email);
+
+        UserInfoDTO pDTO = new UserInfoDTO();
+        pDTO.setEmail(email);
+
+        // 회원아이디를 통해 중복된 아이디인지 조회
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getEmailExists(pDTO)).orElseGet(UserInfoDTO::new);
+
+        log.info(this.getClass().getName() + ".getEmailExists End!");
+
+        return rDTO;
+    }
 
     /**
      * 회원가입 로직 처리
@@ -86,8 +109,8 @@ public class UserInfoController {
              *    무조건 웹으로 받은 정보는 DTO에 저장하기 위해 임시로 String 변수에 저장함
              * #######################################################
              */
-            String user_id = CmmUtil.nvl(request.getParameter("user_id")); //아이디
-            String user_name = CmmUtil.nvl(request.getParameter("user_name")); //이름
+            String userId = CmmUtil.nvl(request.getParameter("userId")); //아이디
+            String userName = CmmUtil.nvl(request.getParameter("userName")); //이름
             String password = CmmUtil.nvl(request.getParameter("password")); //비밀번호
             String email = CmmUtil.nvl(request.getParameter("email")); //이메일
             String addr1 = CmmUtil.nvl(request.getParameter("addr1")); //주소
@@ -106,8 +129,8 @@ public class UserInfoController {
              * 						반드시 작성할 것
              * #######################################################
              * */
-            log.info("user_id : " + user_id);
-            log.info("user_name : " + user_name);
+            log.info("userId : " + userId);
+            log.info("userName : " + userName);
             log.info("password : " + password);
             log.info("email : " + email);
             log.info("addr1 : " + addr1);
@@ -124,8 +147,8 @@ public class UserInfoController {
             //웹(회원정보 입력화면)에서 받는 정보를 저장할 변수를 메모리에 올리기
             pDTO = new UserInfoDTO();
 
-            pDTO.setUserId(user_id);
-            pDTO.setUserName(user_name);
+            pDTO.setUserId(userId);
+            pDTO.setUserName(userName);
 
             //비밀번호는 절대로 복호화되지 않도록 해시 알고리즘으로 암호화함
             pDTO.setPassword(EncryptUtil.encHashSHA256(password));
@@ -219,7 +242,7 @@ public class UserInfoController {
              * ########################################################################
              */
 
-            String user_id = CmmUtil.nvl(request.getParameter("user_id")); //아이디
+            String userId = CmmUtil.nvl(request.getParameter("userId")); //아이디
             String password = CmmUtil.nvl(request.getParameter("password")); //비밀번호
 
             /*
@@ -236,7 +259,7 @@ public class UserInfoController {
              * 						반드시 작성할 것
              * ########################################################################
              * */
-            log.info("user_id : " + user_id);
+            log.info("userId : " + userId);
             log.info("password : " + password);
 
             /*
@@ -251,7 +274,7 @@ public class UserInfoController {
             //웹(회원정보 입력화면)에서 받는 정보를 저장할 변수를 메모리에 올리기
             pDTO = new UserInfoDTO();
 
-            pDTO.setUserId(user_id);
+            pDTO.setUserId(userId);
 
             //비밀번호는 절대로 복호화되지 않도록 해시 알고리즘으로 암호화함
             pDTO.setPassword(EncryptUtil.encHashSHA256(password));
@@ -291,7 +314,7 @@ public class UserInfoController {
                  * Session 단어에서 SS를 가져온 것이다.
                  */
                 msg = "로그인이 성공했습니다.";
-                session.setAttribute("SS_USER_ID", user_id);
+                session.setAttribute("SS_userId", userId);
 
             } else {
                 msg = "아이디와 비밀번호가 올바르지 않습니다.";
@@ -320,13 +343,13 @@ public class UserInfoController {
     /**
      * 로그인 성공 페이지 이동
      */
-    @GetMapping(value = "loginSuccess")
+    @GetMapping(value = "loginResult")
     public String loginSuccess() {
-        log.info(this.getClass().getName() + ".user/loginSuccess Start!");
+        log.info(this.getClass().getName() + ".user/loginResult Start!");
 
-        log.info(this.getClass().getName() + ".user/loginSuccess End!");
+        log.info(this.getClass().getName() + ".user/loginResult End!");
 
-        return "user/loginSuccess";
+        return "user/loginResult";
     }
 
     /**
@@ -531,5 +554,6 @@ public class UserInfoController {
         return "user/newPasswordResult";
 
     }
+
 
 }

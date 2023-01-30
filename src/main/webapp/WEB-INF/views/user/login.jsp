@@ -30,9 +30,9 @@
             $("#btnLogin").on("click", function () {
                 let f = document.getElementById("f"); // form 태그
 
-                if (f.user_id.value === "") {
+                if (f.userId.value === "") {
                     alert("아이디를 입력하세요.");
-                    f.user_id.focus();
+                    f.userId.focus();
                     return;
                 }
 
@@ -56,7 +56,7 @@
 
                             } else { // 로그인 실패
                                 alert(json.msg); // 메시지 띄우기
-                                $("#user_id").focus(); // 아이디 입력 항목에 마우스 커서 이동
+                                $("#userId").focus(); // 아이디 입력 항목에 마우스 커서 이동
                             }
 
                         }
@@ -80,7 +80,7 @@
                 <div class="divTableCell">아이디
                 </div>
                 <div class="divTableCell">
-                    <input type="text" name="user_id" id="user_id" style="width:95%"/>
+                    <input type="text" name="userId" id="userId" style="width:95%"/>
                 </div>
             </div>
             <div class="divTableRow">

@@ -9,25 +9,90 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
 
+        // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
+        let userIdCheck = "Y";
+
+        // 이메일 중복체크 인증번호 발송 값
+        let emailAuthNumber = "";
+
         // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
 
             let f = document.getElementById("f"); // form 태그
 
-            // html의 btnSend id의 버튼 객체 가져오기
-            const btnSend = document.getElementById("btnSend");
-
-            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            btnSend.addEventListener("click", e => {
-                doSubmit(f); // 회원가입하기
+            // 회원가입
+            $("#btnSend").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                doSubmit(f);
             })
 
-            // html의 btnAddr id의 버튼 객체 가져오기
-            const btnAddr = document.getElementById("btnAddr"); // 카카오 주소 조회
+            // 우편번호 찾기
+            $("#btnAddr").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                kakaoPost(f);
+            })
 
-            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            btnAddr.addEventListener("click", e => {
-                kakaoPost(f); // 카카오 주소 조회하기
+            // 아이디 중복체크
+            $("#btnUserId").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+
+                if (f.userId.value === "") {
+                    alert("아이디를 입력하세요.");
+                    f.userId.focus();
+                    return;
+                }
+
+                // Ajax 호출해서 회원가입하기
+                $.ajax({
+                        url: "/user/getUserIdExists",
+                        type: "post", // 전송방식은 Post
+                        dataType: "JSON", // 전송 결과는 JSON으로 받기
+                        data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                        success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
+
+                            if (json.existsYn === "Y") {
+                                alert("이미 가입된 아이디가 존재합니다.");
+                                f.userId.focus();
+
+                            } else { // 회원가입 실패
+                                alert("가입 가능한 아이디입니다.");
+                                userIdCheck = "N";
+                            }
+
+                        }
+                    }
+                )
+
+            })
+
+            // 아이디 중복체크
+            $("#btnEmail").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+
+                if (f.email.value === "") {
+                    alert("이메일을 입력하세요.");
+                    f.email.focus();
+                    return;
+                }
+
+                // Ajax 호출해서 회원가입하기
+                $.ajax({
+                        url: "/user/getEmailExists",
+                        type: "post", // 전송방식은 Post
+                        dataType: "JSON", // 전송 결과는 JSON으로 받기
+                        data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                        success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
+
+                            if (json.existsYn === "Y") {
+                                alert("이미 가입된 이메일 주소가 존재합니다.");
+                                f.email.focus();
+
+                            } else {
+                                alert("이메일로 인증번호가 발송되었습니다. \n받은 메일의 인증번호를 입력하기 바랍니다.");
+                                emailAuthNumber = json.authNumber;
+
+                            }
+
+                        }
+                    }
+                )
+
             })
 
         })
@@ -35,15 +100,21 @@
         //회원가입 정보의 유효성 체크하기
         function doSubmit(f) {
 
-            if (f.user_id.value === "") {
+            if (f.userId.value === "") {
                 alert("아이디를 입력하세요.");
-                f.user_id.focus();
+                f.userId.focus();
                 return;
             }
 
-            if (f.user_name.value === "") {
+            if (userIdCheck !== "N") {
+                alert("아이디 중복 체크 및 중복되지 않은 아이디로 가입 바랍니다.");
+                f.userId.focus();
+                return;
+            }
+
+            if (f.userName.value === "") {
                 alert("이름을 입력하세요.");
-                f.user_name.focus();
+                f.userName.focus();
                 return;
             }
 
@@ -71,6 +142,20 @@
                 return;
             }
 
+            if (f.authNumber.value === "") {
+                alert("이메일 인증번호를 입력하세요.");
+                f.authNumber.focus();
+                return;
+            }
+
+            alert("f.authNumber.value : "+ f.authNumber.value)
+            alert("emailAuthNumber : "+ emailAuthNumber)
+            if (f.authNumber.value != emailAuthNumber) {
+                alert("이메일 인증번호가 일치하지 않습니다.");
+                f.authNumber.focus();
+                return;
+            }
+
             if (f.addr1.value === "") {
                 alert("주소를 입력하세요.");
                 f.addr1.focus();
@@ -85,7 +170,7 @@
 
             // Ajax 호출해서 회원가입하기
             $.ajax({
-                    url: "/ss/insertUserInfo",
+                    url: "/user/insertUserInfo",
                     type: "post", // 전송방식은 Post
                     dataType: "JSON", // 전송 결과는 JSON으로 받기
                     data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
@@ -133,14 +218,15 @@
                 <div class="divTableCell">* 아이디
                 </div>
                 <div class="divTableCell">
-                    <input type="text" name="user_id" style="width:95%"/>
+                    <input type="text" name="userId" style="width:85%"/>
+                    <button id="btnUserId" type="button">아이디 중복체크</button>
                 </div>
             </div>
             <div class="divTableRow">
                 <div class="divTableCell">* 이름
                 </div>
                 <div class="divTableCell">
-                    <input type="text" name="user_name" style="width:95%"/>
+                    <input type="text" name="userName" style="width:95%"/>
                 </div>
             </div>
             <div class="divTableRow">
@@ -161,7 +247,9 @@
                 <div class="divTableCell">* 이메일
                 </div>
                 <div class="divTableCell">
-                    <input type="email" name="email" style="width:95%"/>
+                    <input type="email" name="email" style="width:55%" placeholder="이메일주소"/>
+                    <input type="text" name="authNumber" style="width:30%" placeholder="메일로 발송된 인증번호"/>
+                    <button id="btnEmail" type="button">이메일 중복체크</button>
                 </div>
             </div>
             <div class="divTableRow">
@@ -169,7 +257,7 @@
                 </div>
                 <div class="divTableCell">
                     <input type="text" name="addr1" style="width:85%"/>
-                    <input type="button" id="btnAddr" value="우편번호"/>
+                    <button id="btnAddr" type="button">우편번호</button>
                 </div>
             </div>
             <div class="divTableRow">
@@ -182,7 +270,7 @@
         </div>
     </div>
     <div>
-        <input type="button" id="btnSend" value="회원가입"/>
+        <button id="btnSend" type="button">회원가입</button>
     </div>
 </form>
 </body>
