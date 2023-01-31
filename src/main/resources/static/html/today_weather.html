@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>실시간 날씨 조회하기</title>
+    <link rel="stylesheet" href="/css/table.css"/>
     <script src="/js/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
@@ -38,17 +39,16 @@
                             let dayTempMax = daily.dayTempMax; // 최고 기온
                             let dayTempMin = daily.dayTempMin; // 최저 기온
 
-                            $("#daily_weather").append("<div><b>" + day + "의 날씨</b></div>");
-                            $("#daily_weather").append("<div>");
-                            $("#daily_weather").append("<span>해뜨는 시간 : " + sunrise + " </span>");
-                            $("#daily_weather").append("<span>해지는 시간 : " + sunset + " </span>");
-                            $("#daily_weather").append("<span>달뜨는 시간 : " + moonrise + " </span>");
-                            $("#daily_weather").append("<span>달지는 시간 : " + moonset + " </span>");
-                            $("#daily_weather").append("<span>평균 기온 : " + dayTemp + " </span>");
-                            $("#daily_weather").append("<span>최대 기온 : " + dayTempMax + " </span>");
-                            $("#daily_weather").append("<span>최저 기온 : " + dayTempMin + " </span>");
+                            $("#daily_weather").append("<div class=\"divTableRow\">");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + day + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + sunrise + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + sunset + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + moonrise + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + moonset + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + dayTemp + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + dayTempMax + " </div>");
+                            $("#daily_weather").append("<div class=\"divTableCell\">" + dayTempMin + " </div>");
                             $("#daily_weather").append("</div>");
-                            $("#daily_weather").append("<br/><br/>");
 
                         }
                     }
@@ -58,17 +58,36 @@
     </script>
 </head>
 <body>
-<div>
-    <label>현재 기온 : </label>
-    <span id="currentTemp"></span>
+<h2>오늘의 날씨 실시간 조회</h2>
+<hr/>
+<br/>
+<div class="divTable minimalistBlack">
+    <div class="divTableHeading">
+        <div class="divTableRow">
+            <div class="divTableCell" style="width: 40%">현재 기온</div>
+            <div class="divTableCell" style="width: 40%" id="currentTemp"></div>
+        </div>
+    </div>
 </div>
 <br/><br/>
-<div>
-    <b>일자별 기온</b>
-</div>
+<h2>주간 날씨 실시간 조회</h2>
 <hr/>
-<div id="daily_weather">
+<br/>
+<div class="divTable minimalistBlack">
+    <div class="divTableHeading">
+        <div class="divTableRow">
+            <div class="divTableHead">날짜</div>
+            <div class="divTableHead">해뜨는 시간</div>
+            <div class="divTableHead">해지는 시간</div>
+            <div class="divTableHead">달뜨는 시간</div>
+            <div class="divTableHead">달지는 시간</div>
+            <div class="divTableHead">평균 기온</div>
+            <div class="divTableHead">최고 기온</div>
+            <div class="divTableHead">최저 기온</div>
+        </div>
+    </div>
+    <div class="divTableBody" id="daily_weather">
+    </div>
 </div>
-
 </body>
 </html>
