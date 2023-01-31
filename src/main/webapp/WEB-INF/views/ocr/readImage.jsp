@@ -13,6 +13,7 @@
     <meta charset="UTF-8">
     <title>이미지 파일로부터 인식된 문자열 읽어주기</title>
     <link rel="stylesheet" href="/css/table.css"/>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script>
 
         // Controller에서 보내준 인식된 문자열, Javascript 언어에서 활용하기 위해 변수 생성함
@@ -46,6 +47,7 @@
             window.speechSynthesis.speak(speechMsg);
         }
     </script>
+</head>
 <body>
 <h2>이미지 파일로부터 인식된 문자열 읽어주기</h2>
 <hr/>

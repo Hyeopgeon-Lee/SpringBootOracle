@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class FoodController {
     /**
      * 서울강서캠퍼스 식단 수집을 위한 URL 호출
      */
-    @RequestMapping(value = "toDayFood")
+    @GetMapping(value = "toDayFood")
     public String collectFood(ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".collectFood Start!");

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,17 +33,17 @@ public class OcrController {
     /**
      * 이미지 인식을 위한 파일업로드 화면 호출
      */
-    @RequestMapping(value = "uploadImage")
+    @GetMapping(value = "uploadImage")
     public String uploadImage() {
         log.info(this.getClass().getName() + ".uploadImage!");
 
-        return "/ocr/uploadImage";
+        return "ocr/uploadImage";
     }
 
     /**
      * 파일업로드 및 이미지 인식
      */
-    @RequestMapping(value = "readImage")
+    @PostMapping(value = "readImage")
     public String readImage(ModelMap model, @RequestParam(value = "fileUpload") MultipartFile mf)
             throws Exception {
 
@@ -106,7 +108,7 @@ public class OcrController {
 
         log.info(this.getClass().getName() + ".readImage End!");
 
-        return "/ocr/readImage";
+        return "ocr/readImage";
     }
 }
 
