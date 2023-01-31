@@ -10,6 +10,13 @@
         WHERE USER_ID = #{userId}
     </select>
 
+    <!-- 회원 가입 전 이메일 중복체크하기 -->
+    <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+        SELECT DECODE(COUNT(1), 0, 'N', 'Y') AS EXISTS_YN
+        FROM USER_INFO
+        WHERE EMAIL = #{email}
+    </select>
+
     <!-- 회원 가입하기(회원정보 등록하기) -->
     <insert id="insertUserInfo" parameterType="UserInfoDTO">
         INSERT INTO USER_INFO
@@ -36,7 +43,7 @@
     </insert>
 
     <!-- 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 -->
-    <select id="getUserLoginCheck" parameterType="UserInfoDTO" resultType="UserInfoDTO">
+    <select id="getLogin" parameterType="UserInfoDTO" resultType="UserInfoDTO">
         SELECT USER_ID, USER_NAME, EMAIL
         FROM USER_INFO
         WHERE USER_ID = #{userId}
@@ -69,11 +76,6 @@
         WHERE USER_ID = #{userId}
     </update>
 
-    <!-- 회원 가입 전 이메일 중복체크하기 -->
-    <select id="getEmailExists" parameterType="UserInfoDTO" resultType="UserInfoDTO">
-        SELECT DECODE(COUNT(1), 0, 'N', 'Y') AS EXISTS_YN
-        FROM USER_INFO
-        WHERE EMAIL = #{email}
-    </select>
+
 
 </mapper>

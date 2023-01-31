@@ -3,12 +3,22 @@
 <%@ page import="kopo.poly.util.CmmUtil" %>
 <%
     UserInfoDTO rDTO = (UserInfoDTO) request.getAttribute("rDTO");
+
+    String msg = "";
+
+    if (CmmUtil.nvl(rDTO.getUserId()).length() > 0) { // 아이디 찾기 성공
+        msg = CmmUtil.nvl(rDTO.getUserName()) + " 회원님의 " + CmmUtil.nvl(rDTO.getUserId()) + "입니다.";
+
+    } else {
+        msg = "아이디가 존재하지 않습니다.";
+
+    }
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>아이디 찾기</title>
+    <title><%=msg%>></title>
     <link rel="stylesheet" href="/css/table.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
@@ -33,7 +43,7 @@
         <div class="divTableBody">
             <div class="divTableRow">
                 <div class="divTableCell">
-                    <%=CmmUtil.nvl(rDTO.getUserName())%> 회원님의 아이디는 <%=CmmUtil.nvl(rDTO.getUserId())%>입니다.
+                    <%=msg%>
                 </div>
             </div>
         </div>

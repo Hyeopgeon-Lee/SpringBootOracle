@@ -1,10 +1,9 @@
-<%@ page import="kopo.poly.util.CmmUtil" %>
 <%@ page contentType="text/html;charset=utf-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>공지사항 수정하기</title>
+    <title>메일 작성하기</title>
     <link rel="stylesheet" href="/css/table.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
@@ -33,6 +32,9 @@
     </script>
 </head>
 <body>
+<h2>메일 작성하기</h2>
+<hr/>
+<br/>
 <form id="f">
     <div class="divTable minimalistBlack">
         <div class="divTableBody">

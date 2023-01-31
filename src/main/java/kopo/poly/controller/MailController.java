@@ -20,10 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 @Controller
 public class MailController {
-    /*
-     * 비즈니스 로직(중요 로직을 수행하기 위해 사용되는 서비스를 메모리에 적재(싱글톤패턴 적용됨) 메일 발송을 위한 로직을 구현
-     */
-    private final IMailService mailService;
+
+    private final IMailService mailService; // 메일 발송을 위한 서비스 객체를 사용하기
 
     /**
      * 메일 발송하기폼
@@ -34,7 +32,7 @@ public class MailController {
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + "mailForm Start!");
 
-        return "/mail/mailForm";
+        return "mail/mailForm";
     }
 
     /**

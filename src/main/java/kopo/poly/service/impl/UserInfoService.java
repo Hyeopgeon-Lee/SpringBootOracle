@@ -41,8 +41,9 @@ public class UserInfoService implements IUserInfoService {
 
         log.info(this.getClass().getName() + ".emailAuth Start!");
 
-        // 비밀번호 재설정
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getEmailExists(pDTO)).orElseGet(UserInfoDTO::new);
+        // DB 이메일이 존재하는지 SQL 쿼리 실행
+        // SQL 쿼리에 COUNT()를 사용하기 때문에 반드시 조회 결과는 존재함
+        UserInfoDTO rDTO = userInfoMapper.getEmailExists(pDTO);
 
         String existsYn = CmmUtil.nvl(rDTO.getExistsYn());
 
@@ -50,6 +51,7 @@ public class UserInfoService implements IUserInfoService {
 
         if (existsYn.equals("N")) {
 
+            // 6자리 랜덤 숫자 생성하기
             int authNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
 
             log.info("authNumber : " + authNumber);
@@ -59,7 +61,7 @@ public class UserInfoService implements IUserInfoService {
 
             dto.setTitle("이메일 중복 확인 인증번호 발송 메일");
             dto.setContents("인증번호는 " + authNumber + " 입니다.");
-            dto.setToMail(CmmUtil.nvl(pDTO.getEmail()));
+            dto.setToMail(EncryptUtil.decAES128CBC(CmmUtil.nvl(pDTO.getEmail())));
 
             mailService.doSendMail(dto); // 이메일 발송
 
@@ -73,6 +75,7 @@ public class UserInfoService implements IUserInfoService {
 
         return rDTO;
     }
+
     @Override
     public int insertUserInfo(UserInfoDTO pDTO) throws Exception {
 
@@ -131,22 +134,13 @@ public class UserInfoService implements IUserInfoService {
      * @return 로그인된 회원아이디 정보
      */
     @Override
-    public int getUserLoginCheck(UserInfoDTO pDTO) throws Exception {
+    public UserInfoDTO getLogin(UserInfoDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".getUserLoginCheck Start!");
-
-        // 로그인 성공 : 1, 실패 : 0
-        int res = 0;
+        log.info(this.getClass().getName() + ".getLogin Start!");
 
         // 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 위한 mapper 호출하기
         // userInfoMapper.getUserLoginCheck(pDTO) 함수 실행 결과가 NUll 발생하면, UserInfoDTO 메모리에 올리기
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getUserLoginCheck(pDTO)).orElseGet(UserInfoDTO::new);
-
-        /*
-         * #######################################################
-         *        				로그인 성공 여부 체크 시작!!
-         * #######################################################
-         */
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoMapper.getLogin(pDTO)).orElseGet(UserInfoDTO::new);
 
         /*
          * userInfoMapper로 부터 SELECT 쿼리의 결과로 회원아이디를 받아왔다면, 로그인 성공!!
@@ -156,13 +150,6 @@ public class UserInfoService implements IUserInfoService {
          * 0보다 크다면, 글자가 존재하는 것이기 때문에 값이 존재한다.
          */
         if (CmmUtil.nvl(rDTO.getUserId()).length() > 0) {
-            res = 1;
-
-            /*
-             * #######################################################
-             *        				메일 발송 로직 추가 시작!!
-             * #######################################################
-             */
 
             MailDTO mDTO = new MailDTO();
 
@@ -178,33 +165,21 @@ public class UserInfoService implements IUserInfoService {
             //회원 가입이 성공했기 때문에 메일을 발송함
             mailService.doSendMail(mDTO);
 
-            /*
-             * #######################################################
-             *        				메일 발송 로직 추가 끝!!
-             * #######################################################
-             */
-
         }
 
-        /*
-         * #######################################################
-         *        				로그인 성공 여부 체크 끝!!
-         * #######################################################
-         */
+        log.info(this.getClass().getName() + ".getLogin End!");
 
-        log.info(this.getClass().getName() + ".getUserLoginCheck End!");
-
-        return res;
+        return rDTO;
     }
 
     @Override
     public UserInfoDTO searchUserIdOrPasswordProc(UserInfoDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".searchUserId Start!");
+        log.info(this.getClass().getName() + ".searchUserIdOrPasswordProc Start!");
 
         UserInfoDTO rDTO = userInfoMapper.getUserId(pDTO);
 
-        log.info(this.getClass().getName() + ".searchUserId End!");
+        log.info(this.getClass().getName() + ".searchUserIdOrPasswordProc End!");
 
         return rDTO;
     }
