@@ -4,7 +4,7 @@ import kopo.poly.dto.PapagoDTO;
 import kopo.poly.service.IPapagoService;
 import kopo.poly.util.CmmUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +19,7 @@ public class PapagoController {
     @Resource(name = "PapagoService")
     private IPapagoService papagoService;
 
-    @GetMapping(value = "detectLangs")
+    @PostMapping(value = "detectLangs")
     public PapagoDTO detectLangs(HttpServletRequest request)
             throws Exception {
 
@@ -48,7 +48,7 @@ public class PapagoController {
         return rDTO;
     }
 
-    @GetMapping(value = "translate")
+    @PostMapping(value = "translate")
     public PapagoDTO translate(HttpServletRequest request)
             throws Exception {
 
