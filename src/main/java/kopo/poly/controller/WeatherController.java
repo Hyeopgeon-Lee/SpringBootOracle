@@ -3,35 +3,32 @@ package kopo.poly.controller;
 import kopo.poly.dto.WeatherDTO;
 import kopo.poly.service.IWeatherService;
 import kopo.poly.util.CmmUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
-@RequestMapping(value = "weather")
+@RequestMapping(value = "/weather")
+@RequiredArgsConstructor
 @RestController
 public class WeatherController {
 
-    @Resource(name = "WeatherService")
-    private IWeatherService weatherService;
+    private final IWeatherService weatherService;
 
     @GetMapping(value = "getWeather")
-    public WeatherDTO getWeather(HttpServletRequest request)
-            throws Exception {
+    public WeatherDTO getWeather(HttpServletRequest request) throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".getWeather start!");
+        log.info(this.getClass().getName() + ".getWeather Start!");
 
-        String lat = CmmUtil.nvl(request.getParameter("lat"));
-        String lon = CmmUtil.nvl(request.getParameter("lon"));
-
+        String lat = CmmUtil.nvl(request.getParameter("lat")); // 자바스크립트로부터 받은 위, 경도 값
+        String lon = CmmUtil.nvl(request.getParameter("lon")); // 자바스크립트로부터 받은 위, 경도 값
 
         WeatherDTO pDTO = new WeatherDTO();
-
         pDTO.setLat(lat);
         pDTO.setLon(lon);
 
@@ -44,7 +41,7 @@ public class WeatherController {
         }
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".getWeather end!");
+        log.info(this.getClass().getName() + ".getWeather End!");
 
         return rDTO;
     }

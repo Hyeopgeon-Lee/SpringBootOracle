@@ -3,31 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>네이버 파파고를 이용한 입력된 언어 종류 찾기</title>
+    <link rel="stylesheet" href="/css/table.css"/>
     <script src="/js/jquery-3.6.0.min.js"></script>
     <script>
 
         // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
-
-            // html의 btnSend id의 버튼 객체 가져오기
-            const btnSend = document.getElementById("btnSend");
-
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            btnSend.addEventListener("click", e => {
-                detectLangs(); // 번역하기 실행
+            $("#btnSend").on("click", function () {
+                detectLangs(); // 언어 감지 실행
             })
-
         })
 
         function detectLangs() {
 
             $.ajax({
                 url: "/papago/detectLangs",
-                type: "get,
-                dataType: "JSON",
-                data: {
-                    "text": $("#text").val()
-                },
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                 success: function (json) {
 
                     let text = json.text; // 원문
@@ -45,12 +39,10 @@
 
                     }
 
-                    $("#contents").append("<div>");
-                    $("#contents").append("<span>(원문) " + text + " </span>");
-                    $("#contents").append("<span> => </span>");
-                    $("#contents").append("<span>(언어 종류) <b>" + lang + "</b> </span>");
+                    $("#contents").append("<div class=\"divTableRow\">");
+                    $("#contents").append("<div class=\"divTableCell\">" + text + "</div>");
+                    $("#contents").append("<div class=\"divTableCell\">" + lang + "</div>");
                     $("#contents").append("</div>");
-                    $("#contents").append("<br/><br/>");
 
                 }
             });
@@ -59,16 +51,36 @@
     </script>
 </head>
 <body>
-
-<h2>네이버 파파고를 이용한 한글을 영어로 번역</h2>
+<h2>네이버 파파고를 이용한 언어 감지</h2>
 <hr/>
+<br/>
+<form name="f" id="f">
+    <div class="divTable minimalistBlack">
+        <div class="divTableBody">
+            <div class="divTableRow">
+                <div class="divTableCell" style="width: 30%"> 문장 입력</div>
+                <div class="divTableCell" style="width: 70%"><input type="text" name="text"></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button id="btnSend" type="button">언어 감지하기</button>
+    </div>
+</form>
 <br/><br/>
-<div id="contents"><b>파파고 언어 감지 결과</b><br/></div>
-<div>-------------------------------------------</div>
-<br/><br/>
-<label> 문장 입력 </label>
-<input type="text" id="text"/>
-<button id="btnSend">언어 감지하기</button>
+<h2>언어 감지 결과</h2>
+<hr/>
+<br/>
+<div class="divTable minimalistBlack">
+    <div class="divTableHeading">
+        <div class="divTableRow">
+            <div class="divTableHead" style="width: 70%">원문</div>
+            <div class="divTableHead" style="width: 30%">언어종류</div>
+        </div>
+    </div>
+    <div class="divTableBody" id="contents">
+    </div>
+</div>
 </body>
 </html>
 

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Service("WeatherService")
+@Service
 public class WeatherService implements IWeatherService {
 
     @Value("${weather.api.key}")
@@ -46,7 +46,6 @@ public class WeatherService implements IWeatherService {
 
         double currnetTemp = current.get("temp"); // 현재 기온
         log.info("현재 기온 : " + currnetTemp);
-
 
         // 일별 날씨 조회(OpenAPI가 현재 날짜 기준으로 최대 7일까지 제공)
         List<Map<String, Object>> dailyList = (List<Map<String, Object>>) rMap.get("daily");

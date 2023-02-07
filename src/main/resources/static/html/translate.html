@@ -3,31 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>네이버 파파고를 이용한 한글->영어, 영어->한글 번역</title>
+    <link rel="stylesheet" href="/css/table.css"/>
     <script src="/js/jquery-3.6.0.min.js"></script>
     <script>
 
         // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
-
-            // html의 btnSend id의 버튼 객체 가져오기
-            const btnSend = document.getElementById("btnSend");
-
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            btnSend.addEventListener("click", e => {
+            $("#btnSend").on("click", function () {
                 translate(); // 번역하기 실행
             })
-
         })
 
         function translate() {
 
             $.ajax({
                 url: "/papago/translate",
-                type: "get",
+                type: "post",
                 dataType: "JSON",
-                data: {
-                    "text": $("#text").val()
-                },
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                 success: function (json) {
 
                     let text = json.text; // 원글
@@ -43,12 +37,11 @@
 
                     }
 
-                    $("#contents").append("<div>");
-                    $("#contents").append("<span>(원문) " + text + " </span>");
-                    $("#contents").append("<span> => </span>");
-                    $("#contents").append("<span>(" + tarLang + ") <b>" + translatedText + "</b> </span>");
+                    $("#contents").append("<div class=\"divTableRow\">");
+                    $("#contents").append("<div class=\"divTableCell\">" + text + "</div>");
+                    $("#contents").append("<div class=\"divTableCell\">" + tarLang + "</div>");
+                    $("#contents").append("<div class=\"divTableCell\">" + translatedText + "</div>");
                     $("#contents").append("</div>");
-                    $("#contents").append("<br/><br/>");
 
                 }
             });
@@ -59,13 +52,35 @@
 <body>
 <h2>네이버 파파고를 이용한 한글->영어, 영어->한글 번역</h2>
 <hr/>
+<br/>
+<form name="f" id="f">
+    <div class="divTable minimalistBlack">
+        <div class="divTableBody">
+            <div class="divTableRow">
+                <div class="divTableCell" style="width: 30%"> 문장 입력</div>
+                <div class="divTableCell" style="width: 70%"><input type="text" name="text"></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button id="btnSend" type="button">번역하기</button>
+    </div>
+</form>
 <br/><br/>
-<div id="contents"><b>파파고 번역 내용</b><br/></div>
-<div>-------------------------------------------</div>
-<br/><br/>
-<label>번역할 문장</label>
-<input type="text" id="text"/>
-<button id="btnSend">번역하기</button>
+<h2>언어 번역 결과</h2>
+<hr/>
+<br/>
+<div class="divTable minimalistBlack">
+    <div class="divTableHeading">
+        <div class="divTableRow">
+            <div class="divTableHead" style="width: 40%">원문</div>
+            <div class="divTableHead" style="width: 30%">번역 언어</div>
+            <div class="divTableHead" style="width: 30%">번역 내용</div>
+        </div>
+    </div>
+    <div class="divTableBody" id="contents">
+    </div>
+</div>
 </body>
 </html>
 
