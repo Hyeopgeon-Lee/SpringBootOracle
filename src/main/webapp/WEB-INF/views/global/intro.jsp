@@ -1,9 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>채팅방 입장 및 채팅 리스트</title>
+    <title>글로벌 채팅방 입장 및 채팅 리스트</title>
     <link rel="stylesheet" href="/css/table.css"/>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
@@ -24,7 +23,7 @@
 
             //Ajax 호출
             $.ajax({
-                url: "/chat/roomList", // 채팅방 정보 가져올 URL
+                url: "/global/roomList", // 채팅방 정보 가져올 URL
                 type: "post", // 전송방식
                 dataType: "JSON", // 전달받을 데이터 타입
                 success: function (json) {
@@ -43,7 +42,7 @@
     </script>
 </head>
 <body>
-<h1>채팅방 전체 리스트</h1>
+<h1>글로벌 채팅방 전체 리스트</h1>
 <div class="divTable minimalistBlack">
     <div class="divTableHeading">
         <div class="divTableRow">
@@ -57,10 +56,10 @@
     </div>
 </div>
 <br/><br/>
-<h1>채팅방 입장 정보</h1>
+<h1>글로벌 채팅방 입장 정보</h1>
 <hr/>
 <br/><br/>
-<form name="f" id="f" method="post" action="/chat/chatroom">
+<form name="f" id="f" method="post" action="/global/chatroom">
     <div class="divTable minimalistBlack">
         <div class="divTableBody">
             <div class="divTableRow">
@@ -71,6 +70,13 @@
                 <div class="divTableCell">대화명(별명)</div>
                 <div class="divTableCell">
                     <input type="text" name="userName">
+                </div>
+                <div class="divTableCell">채팅창에 표시할 언어</div>
+                <div class="divTableCell">
+                    <select name="langCode">
+                        <option value="ko">한국어</option>
+                        <option value="en">영어</option>
+                    </select>
                 </div>
             </div>
         </div>

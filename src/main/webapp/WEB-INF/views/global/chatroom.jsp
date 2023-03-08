@@ -8,6 +8,9 @@
     // 채팅방 입장전 입력한 별명
     String userName = CmmUtil.nvl(request.getParameter("userName"));
 
+    // 채팅 대화를 보여줄 언어(한국어를 설정하면, 무조건 한국어로 번역됨, 영어를 선택하면 무조건 영어로 영작됨)
+    String langCode = CmmUtil.nvl(request.getParameter("langCode"));
+
 %>
 <html>
 <html lang="en">
@@ -22,6 +25,7 @@
         let ws; // 웹소켓 객체
         const roomName = "<%=roomName%>"; // 채팅룸 이름
         const userName = "<%=userName%>"; // 채팅유저 이름
+        const langCode = "<%=langCode%>"; // 보여줄 언어
 
         $(document).ready(function () {
 
@@ -32,8 +36,8 @@
 
             }
 
-            // 접속 URL 예 : ws://localhost:10000/ws/테스트방/별명
-            ws = new WebSocket("ws://" + location.host + "/ws/" + roomName + "/" + userName);
+            // 접속 URL 예 : ws://localhost:10000/ws/테스트방/별명/ko
+            ws = new WebSocket("ws://" + location.host + "/ws/" + roomName + "/" + userName + "/" + langCode);
 
             // 웹소켓 열기
             ws.onopen = function (event) {
@@ -49,12 +53,21 @@
                 // 웹소켓으로부터 받은 데이터를 JSON 구조로 변환하기
                 let data = JSON.parse(msg.data);
 
+                let chatMsg;
+
+                if (langCode === "ko") { // 한국어 채팅방인 경우, 한국어 메시지만 출력하기
+                    chatMsg = data.koMsg;
+
+                } else {
+                    chatMsg = data.enMsg; // 영어 채팅방인 경우, 영어 메시지만 출력하기
+                }
+
                 if (data.name === userName) { // 내가 발송한 채팅 메시지는 파란색 글씩
                     $("#chat").append("<div>");
                     $("#chat").append("<span style='color: blue'><b>[보낸 사람] : </b></span>");
                     $("#chat").append("<span style='color: blue'> 나 </span>");
                     $("#chat").append("<span style='color: blue'><b>[발송 메시지] : </b></span>");
-                    $("#chat").append("<span style='color: blue'>" + data.msg + " </span>");
+                    $("#chat").append("<span style='color: blue'>" + chatMsg + " </span>");
                     $("#chat").append("<span style='color: blue'><b>[발송시간] : </b></span>");
                     $("#chat").append("<span style='color: blue'>" + data.date + " </span>");
                     $("#chat").append("</div>");
@@ -74,7 +87,7 @@
                     $("#chat").append("<span><b>[보낸 사람] : </b></span>");
                     $("#chat").append("<span>" + data.name + " </span>");
                     $("#chat").append("<span><b>[수신 메시지] : </b></span>");
-                    $("#chat").append("<span>" + data.msg + " </span>");
+                    $("#chat").append("<span>" + chatMsg + " </span>");
                     $("#chat").append("<span><b>[발송시간] : </b></span>");
                     $("#chat").append("<span>" + data.date + " </span>");
                     $("#chat").append("</div>");
@@ -102,7 +115,7 @@
 <div class="divTable minimalistBlack">
     <div class="divTableHeading">
         <div class="divTableRow">
-            <div class="divTableHead">대화 내용</div>
+            <div class="divTableHead">대화 내용[<%=(langCode.equals("ko")) ? "한국어" : "영어"%> 표시]</div>
         </div>
     </div>
     <div class="divTableBody">

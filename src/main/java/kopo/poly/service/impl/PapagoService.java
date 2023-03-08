@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Slf4j
-@Service("PapagoService")
+@Service
 public class PapagoService implements IPapagoService {
 
     @Value("${naver.papago.clientId}")

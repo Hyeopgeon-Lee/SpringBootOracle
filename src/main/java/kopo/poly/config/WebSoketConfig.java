@@ -28,7 +28,7 @@ public class WebSoketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         log.info("WebSocket Execute!!!");
 
-        registry.addHandler(chatHandler, "/ws/*/*")
+        registry.addHandler(chatHandler, "/ws/*/*/*")
                 .setAllowedOrigins("*")
                 .addInterceptors(
                         new HttpSessionHandshakeInterceptor() {
@@ -45,19 +45,20 @@ public class WebSoketConfig implements WebSocketConfigurer {
 
                                 String roomName = CmmUtil.nvl(urlInfo[2]); // URI Path를 통해 채팅방 이름 가져오기
                                 String userName = CmmUtil.nvl(urlInfo[3]); // URI Path를 통해 사용자 이름 가져오기
+                                String langCode = CmmUtil.nvl(urlInfo[4]); // URI Path를 통해 채팅방의 언어 타입 가져오기
 
                                 // 채팅룸 이름이 한글 및 특수문자로 입력될 수 있기에
                                 // 채팅룸 이름은 데이터 처리에 문제없는 영문이나 숫자로 변환해야 함
                                 // 채팅룸 이름은 해시 함수를 이용하여 영문명으로 변경함
                                 String roomNameHash = EncryptUtil.encHashSHA256(roomName);
 
-                                log.info("roomName : " + roomName);
-                                log.info("userName : " + userName);
-                                log.info("roomNameHash : " + roomNameHash);
+                                log.info("roomName : " + roomName + " / userName : + " + userName +
+                                        " / langCode : " + langCode);
 
                                 attributes.put("roomName", roomName);
                                 attributes.put("userName", userName);
                                 attributes.put("roomNameHash", roomNameHash);
+                                attributes.put("langCode", langCode); // 채팅방 언어(한국어, 영어)
 
                                 return super.beforeHandshake(request, response, wsHandler, attributes);
                             }

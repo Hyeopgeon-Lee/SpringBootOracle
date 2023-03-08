@@ -12,8 +12,8 @@ import java.util.Set;
 
 @Slf4j
 @Controller
-@RequestMapping(value = "/chat")
-public class ChatController {
+@RequestMapping(value = "/global")
+public class GlobalChatController {
 
     /**
      * 채팅창 입장 전
@@ -25,7 +25,7 @@ public class ChatController {
 
         log.info(this.getClass().getName() + ".intro Ends!");
 
-        return "/chat/intro";
+        return "/global/intro";
     }
 
     /**
@@ -36,9 +36,9 @@ public class ChatController {
 
         log.info(this.getClass().getName() + ".chatroom Start!");
 
-        log.info(this.getClass().getName() + ".chatroom End!");
+        log.info(this.getClass().getName() + ".chatroom Ends!");
 
-        return "/chat/chatroom";
+        return "/global/chatroom";
     }
 
     /**

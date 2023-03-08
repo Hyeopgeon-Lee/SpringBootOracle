@@ -6,6 +6,7 @@ import kopo.poly.dto.PapagoDTO;
 import kopo.poly.service.IPapagoService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -13,16 +14,15 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class ChatHandler extends TextWebSocketHandler {
 
-    @Resource(name = "PapagoService")
-    private IPapagoService papagoService;
+    private final IPapagoService papagoService;
 
     // 웹소켓에 접속되는 사용자들을 저장하며, 중복을 제거하기 위해 Set 데이터 구조 사용함
     private static Set<WebSocketSession> clients = Collections.synchronizedSet(new LinkedHashSet<>());
@@ -50,48 +50,39 @@ public class ChatHandler extends TextWebSocketHandler {
         ChatDTO cDTO = new ObjectMapper().readValue(msg, ChatDTO.class);
 
         // 메시지 발송시간 서버 시간으로 설정하여 추가하기
-        cDTO.setDate(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"));
+        cDTO.setDate(DateUtil.getDateTime("yyyy-MM-dd HH:mm:ss"));
 
         String sendMsg = CmmUtil.nvl(cDTO.getMsg()); // 발송하는 메시지(번역을 위해 가져옴)
         log.info("sendMsg : " + sendMsg);
 
-        // 채팅 메시지 네이버 PapagoAPI로 영작 및 번역하기
-        PapagoDTO pDTO = new PapagoDTO();
+        PapagoDTO pDTO = new PapagoDTO(); // 채팅 메시지 네이버 PapagoAPI로 영작 및 번역하기
         pDTO.setText(sendMsg);
 
-        PapagoDTO rDTO = papagoService.translate(pDTO);
-
-        if (rDTO == null) {
-            rDTO = new PapagoDTO();
-        }
-
-        pDTO = null;
+        // 번역하기
+        PapagoDTO rDTO = Optional.ofNullable(papagoService.translate(pDTO)).orElseGet(PapagoDTO::new);
 
         String translatedText = CmmUtil.nvl(rDTO.getTranslatedText()); // 번역된 글
         String scrLangType = CmmUtil.nvl(rDTO.getScrLangType()); // 원문의 언어 종류
         String tarLangType = CmmUtil.nvl(rDTO.getTarLangType()); // 번역된 언어 종류
 
         log.info("translatedText : " + translatedText);
-        log.info("scrLangType : " + scrLangType);
-        log.info("tarLangType : " + tarLangType);
+        log.info("scrLangType : " + scrLangType + "/ tarLangType : " + tarLangType);
 
-        sendMsg = "(원문) " + sendMsg; // 발송하는 채팅 메시지
+        if (scrLangType.equals("ko")) {
+            cDTO.setKoMsg(sendMsg);
+            cDTO.setEnMsg(translatedText);
 
-        if (tarLangType.equals("en")) {
-            sendMsg += "=> (영어 영작) " + translatedText;
-
-        } else if (tarLangType.equals("ko")) {
-            sendMsg += "=> (한국어 번역) " + translatedText;
+        } else {
+            cDTO.setEnMsg(sendMsg);
+            cDTO.setKoMsg(translatedText);
 
         }
-
-        cDTO.setMsg(sendMsg);
+        pDTO = null;
 
         // ChatDTO을 JSON으로 다시 변환하기
         String json = new ObjectMapper().writeValueAsString(cDTO);
 
         log.info("json : " + json);
-
 
         // 웹소켓에 접속된 모든 사용자 검색
         clients.forEach(s -> {
