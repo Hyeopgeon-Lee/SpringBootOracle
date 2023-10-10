@@ -27,11 +27,11 @@
     </insert>
 
     <!-- DB에 저장된 영화 순위 삭제하기 -->
-    <insert id="deleteMovieInfo" parameterType="MovieDTO">
+    <delete id="deleteMovieInfo" parameterType="MovieDTO">
         DELETE
         FROM MOVIE_INFO
         WHERE COLLECT_TIME = #{collectTime}
-    </insert>
+    </delete>
 
     <select id="getMovieInfo" parameterType="MovieDTO" resultType="MovieDTO">
         SELECT COLLECT_TIME,
